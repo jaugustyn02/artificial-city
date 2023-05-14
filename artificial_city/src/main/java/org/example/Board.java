@@ -159,11 +159,11 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	public void mousePressed(MouseEvent e) {
 	}
 
-	public void save(){
-		fileHandler.saveMap(points);
+	public void save(String filePath){
+		fileHandler.saveMap(points, filePath);
 	}
 
-	public void load(){
+	public void load(String fileName){
 //		int[] size = fileHandler.loadSize();
 //		size[0] = Math.max(points.length, size[0]);
 //		size[1] = Math.max(points[0].length, size[1]);
@@ -172,7 +172,7 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		int[] size = new int[2];
 		size[0] = points.length;
 		size[1] = points[0].length;
-		points = fileHandler.loadMap(size);
+		points = fileHandler.loadMap(size, fileName);
 		this.repaint();
 	}
 

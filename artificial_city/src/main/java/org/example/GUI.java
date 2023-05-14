@@ -9,12 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -28,7 +23,9 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 	private JButton save;
 	private JComboBox<CellType> drawType;
 	private JSlider pred;
+	private JTextField fileName;
 	private JFrame frame;
+	private JComboBox<String> filesToLoad;
 	private int iterNum = 0;
 	private final int maxDelay = 500;
 	private final int initDelay = 100;
@@ -72,12 +69,23 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 		drawType.addActionListener(this);
 		drawType.setActionCommand("drawType");
 
+		fileName = new JTextField("XD");
+		fileName.setPreferredSize(new Dimension(100, 25));
+		fileName.setBorder(BorderFactory.createCompoundBorder(
+				fileName.getBorder(),
+				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+
+		filesToLoad = new JComboBox<>(FileHandler.getFilenamesToLoad());
+
+
 		buttonPanel.add(start);
 		buttonPanel.add(clear);
 		buttonPanel.add(drawType);
 		buttonPanel.add(pred);
 		buttonPanel.add(load);
+		buttonPanel.add(filesToLoad);
 		buttonPanel.add(save);
+		buttonPanel.add(fileName);
 
 		board = new Board(1024, 768 - buttonPanel.getHeight());
 		container.add(board, BorderLayout.CENTER);
@@ -115,11 +123,12 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 				board.editType = newType;
 			} else if (command.equals("save")) {
 				if (!running) {
-					board.save();
+					board.save(fileName.getText());
 				}
 			} else if (command.equals("load")) {
 				if (!running) {
-					board.load();
+					String loadFileName = (String)filesToLoad.getSelectedItem();
+					board.load(loadFileName);
 				}
 			}
 		}

@@ -2,16 +2,28 @@ package org.example;
 
 import org.example.cells.CellType;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class FileHandler {
     private static final String resourcesPath = "src/main/resources/maps/";
     public static final String defaultFileName = "default.csv";
 
     public FileHandler(){}
+
+    public static String[] getFilenamesToLoad() {
+        File[] files = new File(resourcesPath).listFiles();
+        if(files == null){
+            return new String[]{};
+        }
+        return  Stream.of(files)
+                .filter(f->!f.isDirectory())
+                .map(File::getName)
+                .toArray(String[]::new);
+    }
 
     public void saveMap(Point[][] points){
         this.saveMap(points, defaultFileName);
