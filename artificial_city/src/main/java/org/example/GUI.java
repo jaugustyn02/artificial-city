@@ -124,11 +124,17 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 			} else if (command.equals("save")) {
 				if (!running) {
 					board.save(fileName.getText());
+					frame.setTitle("Artificial City simulation - saved to: " + fileName.getText());
 				}
 			} else if (command.equals("load")) {
 				if (!running) {
+					iterNum = 0;
+					timer.stop();
+					start.setEnabled(true);
 					String loadFileName = (String)filesToLoad.getSelectedItem();
+					board.clear();
 					board.load(loadFileName);
+					frame.setTitle("Artificial City simulation - loaded: " + loadFileName);
 				}
 			}
 		}

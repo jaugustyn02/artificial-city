@@ -164,11 +164,6 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	}
 
 	public void load(String fileName){
-//		int[] size = fileHandler.loadSize();
-//		size[0] = Math.max(points.length, size[0]);
-//		size[1] = Math.max(points[0].length, size[1]);
-//		this.setSize(size[0]*this.size, size[1]*this.size);
-
 		int[] size = new int[2];
 		size[0] = points.length;
 		size[1] = points[0].length;

@@ -81,8 +81,8 @@ public class FileHandler {
         try (BufferedReader br = new BufferedReader(new FileReader(resourcesPath + fileName))) {
             String[] dimensions = br.readLine().split(";");
 
-            int length = Integer.parseInt(dimensions[0]);
-            int height = Integer.parseInt(dimensions[1]);
+//            int length = Integer.parseInt(dimensions[0]);
+//            int height = Integer.parseInt(dimensions[1]);
 
             points = new Point[size[0]][size[1]];
 
