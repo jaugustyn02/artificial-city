@@ -1,6 +1,9 @@
 package org.example.cells;
 
+import org.example.MovingObject;
 import org.example.Point;
+import org.example.moving.Car;
+import org.example.moving.Pedestrian;
 
 import java.awt.*;
 
@@ -44,8 +47,6 @@ public enum CellType {
 
    public Point getObject(){
        return switch (this) {
-           case CAR -> new Car();
-           case PEDESTRIAN -> new Pedestrian();
            case ROAD -> new Road();
            case SIDEWALK -> new Sidewalk();
            case CROSSING -> new Crossing();
@@ -62,4 +63,12 @@ public enum CellType {
 
        };
    }
+
+    public MovingObject getMovingObject() {
+        return switch (this) {
+            case CAR -> new Car();
+            case PEDESTRIAN -> new Pedestrian();
+            default -> null;
+        };
+    }
 }

@@ -69,7 +69,7 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 		drawType.addActionListener(this);
 		drawType.setActionCommand("drawType");
 
-		fileName = new JTextField("XD");
+		fileName = new JTextField("");
 		fileName.setPreferredSize(new Dimension(100, 25));
 		fileName.setBorder(BorderFactory.createCompoundBorder(
 				fileName.getBorder(),
