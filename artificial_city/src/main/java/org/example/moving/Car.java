@@ -35,30 +35,25 @@ public class Car extends MovingObject{
     }
 
     public void slowDown(Point[][] points,MovingObject[][] movingObjects ) {
-//        if(distanceToNextCar < velocity){
-//            velocity = distanceToNextCar;
-//        }
+
         int distanceToNextCar = 0;
         Vector2D pos = new Vector2D(x,y);
+        int maxVelocity = velocity;
         while (distanceToNextCar < velocity){
-            distanceToNextCar++;
             pos = pos.add(direction.getVector());
-
             MovingObject obj = movingObjects[pos.x()][pos.y()];
+            Point point = points[pos.x()][pos.y()];
 
-            if(obj != null){
-                velocity = distanceToNextCar-1;
+            if(obj != null || !(point instanceof Drivable)){
+                maxVelocity = distanceToNextCar;
                 break;
             }
-        }
 
-        Vector2D toAdd = direction.getVector().multiply(velocity);
-        tmpPosition = toAdd.add(new Vector2D(x,y));
-
-        while (!(points[tmpPosition.x()][tmpPosition.y()] instanceof Drivable)){
-            tmpPosition = tmpPosition.add(direction.getVector().multiply(-1));
-            velocity--;
+            distanceToNextCar++;
         }
+        Vector2D toAdd = direction.getVector().multiply(maxVelocity);
+        tmpPosition = new Vector2D(x,y).add(toAdd);
+        velocity = maxVelocity;
 
 
     }
