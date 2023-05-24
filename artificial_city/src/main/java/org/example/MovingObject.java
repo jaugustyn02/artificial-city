@@ -1,14 +1,16 @@
 package org.example;
 
 import org.example.cells.CellType;
+import org.example.moving.BoardDirection;
 
-import java.util.Vector;
 
 public abstract class MovingObject {
-    protected int velocity;
     protected int x;
     protected int y;
+    protected int velocity = 0;
     protected CellType type;
+    protected BoardDirection direction;
+
     public MovingObject(CellType type){
         this.type = type;
     }
@@ -23,5 +25,9 @@ public abstract class MovingObject {
     }
     public int getY(){
         return y;
+    }
+
+    public void setVelocity(int velocity){
+        this.velocity = velocity;
     }
 }

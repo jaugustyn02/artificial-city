@@ -1,6 +1,8 @@
 package org.example;
 
 import org.example.cells.CellType;
+import org.example.cells.Entrance;
+import org.example.iterable.IterablePoint;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -11,8 +13,11 @@ import java.util.stream.Stream;
 public class FileHandler {
     private static final String resourcesPath = "src/main/resources/maps/";
     public static final String defaultFileName = "default.csv";
+    public Board board;
 
-    public FileHandler(){}
+    public FileHandler(Board board){
+        this.board = board;
+    }
 
     public static String[] getFilenamesToLoad() {
         File[] files = new File(resourcesPath).listFiles();
@@ -73,10 +78,10 @@ public class FileHandler {
         return size;
     }
 
-    public Point[][] loadMap(int[] size){
-        return loadMap(size, defaultFileName);
+    public void loadMap(int[] size){
+        loadMap(size, defaultFileName);
     }
-    public Point[][] loadMap(int[] size, String fileName){
+    public void loadMap(int[] size, String fileName){
         Point[][] points;
         try (BufferedReader br = new BufferedReader(new FileReader(resourcesPath + fileName))) {
             String[] dimensions = br.readLine().split(";");
@@ -93,10 +98,14 @@ public class FileHandler {
                 for (int j = 0; j < size[1]; j++) {
                     if (i < size[0]) {
                         if (j < types.length) {
-                            points[i][j] = CellType.values()[Integer.parseInt(types[j])].getObject();
+//                            points[i][j] = CellType.values()[Integer.parseInt(types[j])].getObject();
+                            board.editType = CellType.values()[Integer.parseInt(types[j])];
+                            board.setCell(i, j);
                         }
                         else {
-                            points[i][j] = CellType.NOT_SPECIFIED.getObject();
+//                            points[i][j] = CellType.NOT_SPECIFIED.getObject();
+                            board.editType = CellType.NOT_SPECIFIED;
+                            board.setCell(i, j);
                         }
                     }
                 }
@@ -104,13 +113,15 @@ public class FileHandler {
             }
             for (int x = i;x < size[0]; x++){
                 for (int y = 0; y < size[1]; y++){
-                    points[x][y] = CellType.NOT_SPECIFIED.getObject();
+//                    points[x][y] = CellType.NOT_SPECIFIED.getObject();
+                    board.editType = CellType.NOT_SPECIFIED;
+                    board.setCell(x, y);
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
-            points = new Point[][]{{CellType.NOT_SPECIFIED.getObject()}};
+//            points = new Point[][]{{CellType.NOT_SPECIFIED.getObject()}};
         }
-        return points;
+//        return points;
     }
 }
