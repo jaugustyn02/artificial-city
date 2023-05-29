@@ -5,19 +5,21 @@ import org.example.MovingObject;
 import org.example.Point;
 import org.example.cells.CellType;
 import org.example.cells.Drivable;
-import org.example.cells.Road;
 import org.example.helpers.Vector2D;
 
+
 public class Car extends MovingObject{
-    private int velocity = 0;
-    private BoardDirection direction;
     public final static double slowDownChance = 0.2;
 
-    private Vector2D tmpPosition;
+    private Vector2D nextPosition;
 
     public Car() {
+        this(BoardDirection.RIGHT);
+    }
+
+    public Car(BoardDirection direction){
         super(CellType.CAR);
-        direction = BoardDirection.RIGHT;
+        this.direction = direction;
     }
 
     @Override
@@ -52,9 +54,8 @@ public class Car extends MovingObject{
             distanceToNextCar++;
         }
         Vector2D toAdd = direction.getVector().multiply(maxVelocity);
-        tmpPosition = new Vector2D(x,y).add(toAdd);
+        nextPosition = new Vector2D(x,y).add(toAdd);
         velocity = maxVelocity;
-
 
     }
 
@@ -68,8 +69,8 @@ public class Car extends MovingObject{
 
     }
     public void move(){
-        x = tmpPosition.x();
-        y = tmpPosition.y();
+        x = nextPosition.x();
+        y = nextPosition.y();
     }
 //    public void moveCar(Point newPoint, boolean exceededPeriodicBoundaries){
 //        if (numOfMovesOnNewLane == numOfMovesBeforeColorReset){

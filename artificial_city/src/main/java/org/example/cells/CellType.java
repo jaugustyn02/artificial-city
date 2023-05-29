@@ -2,6 +2,11 @@ package org.example.cells;
 
 import org.example.MovingObject;
 import org.example.Point;
+import org.example.iterable.CarEntrance;
+import org.example.iterable.CarExit;
+import org.example.iterable.PedestrianEntrance;
+import org.example.iterable.PedestrianExit;
+import org.example.moving.BoardDirection;
 import org.example.moving.Car;
 import org.example.moving.Pedestrian;
 
@@ -61,6 +66,14 @@ public enum CellType {
            case PEDESTRIAN_ENTRANCE -> new PedestrianEntrance();
            default -> new Point();
 
+       };
+   }
+
+   public MovingObject getMovingObject(BoardDirection direction){
+       return switch (this) {
+           case CAR -> new Car(direction);
+           case PEDESTRIAN -> new Pedestrian();
+           default -> null;
        };
    }
 

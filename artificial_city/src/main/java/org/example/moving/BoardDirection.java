@@ -12,7 +12,7 @@ public enum BoardDirection {
     RIGHT,
     TOP_RIGHT;
 
-    Vector2D getVector(){
+    public Vector2D getVector(){
         return switch (this){
             case TOP -> new Vector2D(0,-1);
             case TOP_LEFT -> new Vector2D(-1,-1);

@@ -10,4 +10,14 @@ public class Pedestrian extends MovingObject {
     public Pedestrian() {
         super(CellType.PEDESTRIAN);
     }
+
+    @Override
+    public void iterate(Point[][] points, MovingObject[][] movingObjects) {
+
+    }
+
+    @Override
+    public void move() {
+
+    }
 }

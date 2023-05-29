@@ -11,7 +11,6 @@ public class Point {
 	public Point(CellType type) {
 		this.type = type;
 	}
-	public void iterate(){}
 	public void clicked() {
 	}
 	
