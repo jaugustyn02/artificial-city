@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.cells.CellType;
+import org.example.cells.Lights;
 import org.example.moving.BoardDirection;
 
 

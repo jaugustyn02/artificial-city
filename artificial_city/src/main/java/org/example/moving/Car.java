@@ -46,7 +46,7 @@ public class Car extends MovingObject{
             MovingObject obj = movingObjects[pos.x()][pos.y()];
             Point point = points[pos.x()][pos.y()];
 
-            if(obj != null || !(point instanceof Drivable)){
+            if(obj != null || !(point instanceof Drivable d) || !d.canDriveThrough()){
                 maxVelocity = distanceToNextCar;
                 break;
             }

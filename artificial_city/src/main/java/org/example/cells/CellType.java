@@ -55,7 +55,7 @@ public enum CellType {
            case ROAD -> new Road();
            case SIDEWALK -> new Sidewalk();
            case CROSSING -> new Crossing();
-           case LIGHTS -> new Lights();
+//           case LIGHTS -> new Lights();
            case GRASS -> new Grass();
            case TREE -> new Tree();
            case BUILDING -> new Building();

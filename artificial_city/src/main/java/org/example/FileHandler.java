@@ -1,7 +1,6 @@
 package org.example;
 
-import org.example.cells.CellType;
-import org.example.cells.Entrance;
+import org.example.cells.*;
 import org.example.iterable.IterablePoint;
 
 import java.io.*;
@@ -122,6 +121,82 @@ public class FileHandler {
             e.printStackTrace();
 //            points = new Point[][]{{CellType.NOT_SPECIFIED.getObject()}};
         }
+        Lights l1 = new Lights(65,19);
+        board.lights.add(l1);
+
+        l1.addPoint(board.getPointAt(65,20));
+        if(board.getPointAt(65,20) instanceof Drivable p){
+            p.setLightsController(l1);
+        }
+
+        l1.addPoint(board.getPointAt(65,21));
+        if(board.getPointAt(65,21) instanceof Drivable p){
+            p.setLightsController(l1);
+        }
+
+        l1.addPoint(board.getPointAt(65,22));
+        if(board.getPointAt(65,22) instanceof Drivable p){
+            p.setLightsController(l1);
+        }
+
+        Lights l2 = new Lights(58,30);
+        board.lights.add(l2);
+
+        l2.addPoint(board.getPointAt(58,29));
+        if(board.getPointAt(58,29) instanceof Drivable p){
+            p.setLightsController(l2);
+        }
+
+        l2.addPoint(board.getPointAt(58,28));
+        if(board.getPointAt(58,28) instanceof Drivable p){
+            p.setLightsController(l2);
+        }
+
+        l2.addPoint(board.getPointAt(58,27));
+        if(board.getPointAt(58,27) instanceof Drivable p){
+            p.setLightsController(l2);
+        }
+
+        Lights l3 = new Lights(59,16);
+        board.lights.add(l3);
+
+        l3.addPoint(board.getPointAt(60,16));
+        if(board.getPointAt(60,16) instanceof Drivable p){
+            p.setLightsController(l3);
+        }
+
+        l3.addPoint(board.getPointAt(61,16));
+        if(board.getPointAt(61,16) instanceof Drivable p){
+            p.setLightsController(l3);
+        }
+
+        Lights l4 = new Lights(64,33);
+        board.lights.add(l4);
+
+        l4.addPoint(board.getPointAt(63,33));
+        if(board.getPointAt(63,33) instanceof Drivable p){
+            p.setLightsController(l4);
+        }
+
+        l4.addPoint(board.getPointAt(62,33));
+        if(board.getPointAt(62,33) instanceof Drivable p){
+            p.setLightsController(l4);
+        }
+
+        LightsCrossingController controller = new LightsCrossingController();
+        List<Lights> lights = new ArrayList<>();
+        lights.add(l1);
+        lights.add(l2);
+        lights.add(l3);
+        lights.add(l4);
+
+        List<State> states = new ArrayList<>();
+        states.add(new State(new LightColor[]{LightColor.GREEN, LightColor.GREEN,LightColor.RED, LightColor.RED}, 50));
+        states.add(new State(new LightColor[]{LightColor.RED,LightColor.RED,LightColor.GREEN, LightColor.GREEN}, 50));
+
+        controller.initialize(lights, states);
+        board.lightsCrossingControllers.add(controller);
+
 //        return points;
     }
 }

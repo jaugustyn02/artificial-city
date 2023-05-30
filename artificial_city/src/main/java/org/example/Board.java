@@ -3,6 +3,7 @@ package org.example;
 import org.example.cells.CellType;
 import org.example.cells.Entrance;
 import org.example.cells.Exit;
+import org.example.cells.Lights;
 import org.example.iterable.CarEntrance;
 import org.example.iterable.CarExit;
 import org.example.iterable.IterablePoint;
@@ -31,6 +32,8 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	private Point[][] points;
 	private MovingObject[][] movingObjects;
 	private IterablePoint[][] iterablePoints;
+	public List<Lights> lights = new ArrayList<>();
+	public List<LightsCrossingController> lightsCrossingControllers = new ArrayList<>();
 	final private int size = 10;
 	public CellType editType = CellType.NOT_SPECIFIED;
 	public FileHandler fileHandler = new FileHandler(this);
@@ -70,6 +73,10 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		for(IterablePoint point : getIterablePoints1d()){
 			if (point instanceof Entrance)
 				point.iterate();
+		}
+
+		for(LightsCrossingController controller: lightsCrossingControllers){
+			controller.iterate();
 		}
 
 		this.repaint();
@@ -153,6 +160,11 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		for(MovingObject obj : getMovingObjects1d()){
 			g.setColor(obj.type.getColor());
 			g.fillRect((obj.x * size) + 1, (obj.y * size) + 1, (size - 1), (size - 1));
+		}
+
+		for(Lights l: lights){
+			g.setColor(l.getColor());
+			g.fillOval((l.x * size), (l.y * size), size, size);
 		}
 	}
 

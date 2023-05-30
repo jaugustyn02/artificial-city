@@ -39,7 +39,8 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 
 	public void initialize(Container container) {
 		container.setLayout(new BorderLayout());
-		container.setSize(new Dimension(1024, 768));
+//		container.setSize(new Dimension(1024, 768));
+		container.setSize(new Dimension(1200, 800));
 
 		JPanel buttonPanel = new JPanel();
 
@@ -76,6 +77,7 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
 		filesToLoad = new JComboBox<>(FileHandler.getFilenamesToLoad());
+		filesToLoad.setSelectedIndex(4);
 
 
 		buttonPanel.add(start);

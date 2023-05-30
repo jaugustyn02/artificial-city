@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.cells.CellType;
+import org.example.cells.Drivable;
 
 public class Point {
 	public CellType type;
@@ -16,7 +17,5 @@ public class Point {
 	
 	public void clear() {
 	}
-
-
 
 }
