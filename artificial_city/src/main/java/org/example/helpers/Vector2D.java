@@ -8,4 +8,12 @@ public record Vector2D(int x, int y) {
     public Vector2D multiply(int n){
         return new Vector2D(x * n, y * n);
     }
+
+    @Override
+    public String toString() {
+        return "Vector2D{" +
+                "x=" + x +
+                ", y=" + y +
+                '}';
+    }
 }

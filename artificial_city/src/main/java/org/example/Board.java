@@ -52,6 +52,8 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		addMouseMotionListener(this);
 		setBackground(Color.WHITE);
 		setOpaque(true);
+		System.out.println(length);
+		System.out.println(height);
 	}
 
 	public void iteration() {
@@ -202,6 +204,7 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		int height = (this.getHeight() / size) + 1;
 //		initialize(dlugosc, wysokosc);
 		initializeNewPoints(length, height);
+		System.out.println(this.length);
 	}
 
 	public void mouseDragged(MouseEvent e) {

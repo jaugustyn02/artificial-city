@@ -58,4 +58,8 @@ public class CarExit extends IterablePoint implements Exit {
         int y = vector.y();
         return (x >= 0 && y >= 0 && x < board.getWidth() && y < board.getHeight());
     }
+
+    public void removeCar(Vector2D vector){
+        board.removeMovingObjectsAt(vector.x(), vector.y());
+    }
 }

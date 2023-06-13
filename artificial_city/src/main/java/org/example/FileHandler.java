@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.awt.event.ComponentEvent.COMPONENT_RESIZED;
+
 public class FileHandler {
     private static final String resourcesPath = "src/main/resources/maps/";
     public static final String defaultFileName = "default.csv";
@@ -192,7 +194,9 @@ public class FileHandler {
 
         List<State> states = new ArrayList<>();
         states.add(new State(new LightColor[]{LightColor.GREEN, LightColor.GREEN,LightColor.RED, LightColor.RED}, 50));
+        states.add(new State(new LightColor[]{LightColor.RED, LightColor.RED,LightColor.RED, LightColor.RED}, 5));
         states.add(new State(new LightColor[]{LightColor.RED,LightColor.RED,LightColor.GREEN, LightColor.GREEN}, 50));
+        states.add(new State(new LightColor[]{LightColor.RED,LightColor.RED,LightColor.RED, LightColor.RED}, 5));
 
         controller.initialize(lights, states);
         board.lightsCrossingControllers.add(controller);

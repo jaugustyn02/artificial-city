@@ -89,7 +89,18 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 		buttonPanel.add(save);
 		buttonPanel.add(fileName);
 
-		board = new Board(1024, 768 - buttonPanel.getHeight());
+		BoardDirection[] dirValues = BoardDirection.values();
+		for (int i=0; i<dirValues.length; i++) {
+			directionPercents[i] = new JTextField("0");
+			directionPercents[i].setPreferredSize(new Dimension(30, 25));
+			buttonPanel.add(directionPercents[i]);
+		}
+		buttonPanel.add(saveNumbers);
+
+//		int length = (1200 / 10) + 1;
+//		int height = (800 / 10) + 1 - buttonPanel.getHeight();
+
+		board = new Board(1200, 800 - buttonPanel.getHeight());
 		container.add(board, BorderLayout.CENTER);
 		container.add(buttonPanel, BorderLayout.SOUTH);
 	}

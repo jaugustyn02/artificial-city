@@ -6,6 +6,9 @@ import org.example.Point;
 import org.example.cells.CellType;
 import org.example.cells.Drivable;
 import org.example.helpers.Vector2D;
+import org.example.iterable.CarExit;
+
+import java.util.List;
 
 
 public class Car extends MovingObject{
@@ -41,21 +44,64 @@ public class Car extends MovingObject{
         int distanceToNextCar = 0;
         Vector2D pos = new Vector2D(x,y);
         int maxVelocity = velocity;
+
+        boolean changedDirection = false;
+
         while (distanceToNextCar < velocity){
             pos = pos.add(direction.getVector());
             MovingObject obj = movingObjects[pos.x()][pos.y()];
             Point point = points[pos.x()][pos.y()];
 
             if(obj != null || !(point instanceof Drivable d) || !d.canDriveThrough()){
+                if(point instanceof CarExit exit){
+                    exit.removeCar(new Vector2D(x,y));
+                }
+                maxVelocity = distanceToNextCar;
+
+                break;
+            }
+            distanceToNextCar++;
+
+            driveDirection = d.getDriveDirection();
+            if (driveDirection == null){
+                driveDirection = this.direction;
+            }
+            if (driveDirection != this.direction){
+                changedDirection = true;
                 maxVelocity = distanceToNextCar;
                 break;
             }
 
-            distanceToNextCar++;
+//            List<BoardDirection> avDir = d.getAvailableDirections();
+//            if (avDir.size() == 1){
+//                continue;
+//            }
+//            if(avDir.size() == 0){
+//                maxVelocity = distanceToNextCar;
+//                break;
+//            }
+//
+//            int index = (int)(Math.random()*avDir.size());
+//            BoardDirection newDirection = avDir.get(index);
+//            if(newDirection == direction){
+//                continue;
+//            }
+
+//            this.direction = newDirection;
+//            changedDirection = true;
+//            maxVelocity = distanceToNextCar;
+//            break;
+
+
         }
         Vector2D toAdd = direction.getVector().multiply(maxVelocity);
         nextPosition = new Vector2D(x,y).add(toAdd);
         velocity = maxVelocity;
+
+        if(changedDirection){
+            velocity = 0;
+            this.direction = driveDirection;
+        }
 
     }
 
