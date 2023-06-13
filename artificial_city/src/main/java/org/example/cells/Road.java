@@ -5,7 +5,9 @@ import org.example.moving.BoardDirection;
 import org.example.moving.Direction;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class Road extends Point implements Drivable {
 //    private List<BoardDirection>  availableDirections = new ArrayList<>();

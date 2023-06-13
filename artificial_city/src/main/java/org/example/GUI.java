@@ -1,12 +1,14 @@
 package org.example;
 
 import org.example.cells.CellType;
+import org.example.moving.BoardDirection;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dimension;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.swing.*;
@@ -21,6 +23,8 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 	private JButton clear;
 	private JButton load;
 	private JButton save;
+	private JButton saveNumbers;
+	private JTextField[] directionPercents;
 	private JComboBox<CellType> drawType;
 	private JSlider pred;
 	private JTextField fileName;
@@ -40,7 +44,7 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 	public void initialize(Container container) {
 		container.setLayout(new BorderLayout());
 //		container.setSize(new Dimension(1024, 768));
-		container.setSize(new Dimension(1200, 800));
+		container.setSize(new Dimension(1201, 801));
 
 		JPanel buttonPanel = new JPanel();
 
@@ -60,6 +64,12 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 		save.setActionCommand("save");
 		save.addActionListener(this);
 
+		saveNumbers = new JButton("Save");
+		saveNumbers.setActionCommand("save2");
+		saveNumbers.addActionListener(this);
+
+		directionPercents = new JTextField[BoardDirection.values().length];
+
 		pred = new JSlider();
 		pred.setMinimum(0);
 		pred.setMaximum(maxDelay);
@@ -78,7 +88,6 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 
 		filesToLoad = new JComboBox<>(FileHandler.getFilenamesToLoad());
 		filesToLoad.setSelectedIndex(4);
-
 
 		buttonPanel.add(start);
 		buttonPanel.add(clear);
@@ -129,9 +138,8 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 				start.setEnabled(true);
 				board.clear();
 				frame.setTitle("Artificial City simulation");
-			}
-			else if (command.equals("drawType")){
-				CellType newType = (CellType)drawType.getSelectedItem();
+			} else if (command.equals("drawType")) {
+				CellType newType = (CellType) drawType.getSelectedItem();
 				System.out.println(newType);
 				board.editType = newType;
 			} else if (command.equals("save")) {
@@ -144,12 +152,19 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 					iterNum = 0;
 					timer.stop();
 					start.setEnabled(true);
-					String loadFileName = (String)filesToLoad.getSelectedItem();
+					String loadFileName = (String) filesToLoad.getSelectedItem();
 					board.clear();
 					board.load(loadFileName);
 					frame.setTitle("Artificial City simulation - loaded: " + loadFileName);
 				}
-			}
+			} else if (command.equals("save2"))
+				for (int i = 0; i < BoardDirection.values().length; i++) {
+					int percent = (int) Integer.parseInt(directionPercents[i].getText());
+					if (percent < 0 || percent > 100) {
+						percent = 0;
+					}
+					board.editDirectionPercents[i] = percent;
+				}
 		}
 	}
 

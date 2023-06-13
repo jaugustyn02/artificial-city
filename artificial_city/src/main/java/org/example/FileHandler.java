@@ -3,8 +3,10 @@ package org.example;
 import org.example.cells.*;
 import org.example.iterable.IterablePoint;
 
+import java.awt.event.ComponentEvent;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -38,7 +40,7 @@ public class FileHandler {
     public void saveMap(Point[][] points, String fileName){
         int length = points.length;
         int height = points[0].length;
-        FileWriter fw = null;
+        FileWriter fw;
         try {
             fw = new FileWriter(resourcesPath + fileName);
 
@@ -46,7 +48,15 @@ public class FileHandler {
 
             for (Point[] points_row : points) {
                 for (Point point: points_row) {
-                    fw.write(point.type.ordinal() + ";");
+                    if (point instanceof Drivable drivable){
+                        fw.write(
+                                point.type.ordinal()+":"+
+                                Arrays.toString(drivable.getDrivableChances()).replaceAll("\\s", "")+";"
+                        );
+                    }
+                    else {
+                        fw.write(point.type.ordinal() + ";");
+                    }
                 }
                 fw.write("\n");
             }
@@ -83,28 +93,31 @@ public class FileHandler {
         loadMap(size, defaultFileName);
     }
     public void loadMap(int[] size, String fileName){
-        Point[][] points;
         try (BufferedReader br = new BufferedReader(new FileReader(resourcesPath + fileName))) {
             String[] dimensions = br.readLine().split(";");
 
-//            int length = Integer.parseInt(dimensions[0]);
-//            int height = Integer.parseInt(dimensions[1]);
-
-            points = new Point[size[0]][size[1]];
+//            int width = Integer.parseInt(dimensions[0]) * board.size;
+//            int height = Integer.parseInt(dimensions[1]) * board.size;
+//            board.setSize(width, height);
+//            board.componentResized(null);
 
             String line;
             int i = 0;
             while ((line = br.readLine()) != null) {
-                String[] types = line.split(";");
+                String[] points = line.split(";");
                 for (int j = 0; j < size[1]; j++) {
                     if (i < size[0]) {
-                        if (j < types.length) {
-//                            points[i][j] = CellType.values()[Integer.parseInt(types[j])].getObject();
-                            board.editType = CellType.values()[Integer.parseInt(types[j])];
-                            board.setCell(i, j);
+                        if (j < points.length) {
+                            String[] values = points[j].split(":");
+                            board.editType = CellType.values()[Integer.parseInt(values[0])];
+                            if (board.editType.getObject() instanceof Drivable){
+                                String[] str = values[1].replaceAll("[\\[\\]]", "").split(",");
+                                
+                                for(int i=0; i<)
+                            }
+//                            board.setCell(i, j);
                         }
                         else {
-//                            points[i][j] = CellType.NOT_SPECIFIED.getObject();
                             board.editType = CellType.NOT_SPECIFIED;
                             board.setCell(i, j);
                         }
@@ -114,14 +127,12 @@ public class FileHandler {
             }
             for (int x = i;x < size[0]; x++){
                 for (int y = 0; y < size[1]; y++){
-//                    points[x][y] = CellType.NOT_SPECIFIED.getObject();
                     board.editType = CellType.NOT_SPECIFIED;
                     board.setCell(x, y);
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
-//            points = new Point[][]{{CellType.NOT_SPECIFIED.getObject()}};
         }
         Lights l1 = new Lights(65,19);
         board.lights.add(l1);

@@ -41,6 +41,7 @@ public class Car extends MovingObject{
 
     public void slowDown(Point[][] points,MovingObject[][] movingObjects ) {
 
+        BoardDirection driveDirection = this.direction;
         int distanceToNextCar = 0;
         Vector2D pos = new Vector2D(x,y);
         int maxVelocity = velocity;
@@ -118,18 +119,4 @@ public class Car extends MovingObject{
         x = nextPosition.x();
         y = nextPosition.y();
     }
-//    public void moveCar(Point newPoint, boolean exceededPeriodicBoundaries){
-//        if (numOfMovesOnNewLane == numOfMovesBeforeColorReset){
-//            currentColorID = defaultColorID;
-//        }
-//        if (!hasMoved && velocity > 0) {
-//            if (!exceededPeriodicBoundaries || Math.random() > disappearChance) {
-//                newPoint.velocity = velocity;
-//                newPoint.hasMoved = true;
-//                newPoint.currentColorID = currentColorID;
-//                newPoint.numOfMovesOnNewLane = numOfMovesOnNewLane + 1;
-//            }
-//            clear();
-//        }
-//    }
 }

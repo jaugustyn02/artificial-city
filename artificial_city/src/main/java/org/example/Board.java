@@ -1,9 +1,6 @@
 package org.example;
 
-import org.example.cells.CellType;
-import org.example.cells.Entrance;
-import org.example.cells.Exit;
-import org.example.cells.Lights;
+import org.example.cells.*;
 import org.example.iterable.CarEntrance;
 import org.example.iterable.CarExit;
 import org.example.iterable.IterablePoint;
@@ -34,11 +31,12 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	private IterablePoint[][] iterablePoints;
 	public List<Lights> lights = new ArrayList<>();
 	public List<LightsCrossingController> lightsCrossingControllers = new ArrayList<>();
-	final private int size = 10;
+	final public int size = 10;
 	public CellType editType = CellType.NOT_SPECIFIED;
 	public FileHandler fileHandler = new FileHandler(this);
 
 	public BoardDirection editDirection = BoardDirection.RIGHT;
+	public int[] editDirectionPercents = {0, 0, 0, 0};
 
 	private int length;
 	private int height;
@@ -106,6 +104,7 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 
 	private void initializeNewPoints(int length, int height) {
 		Point[][] new_points = new Point[length][height];
+		System.out.println("New points: "+length+" "+height);
 		this.length = length;
 		this.height = height;
 
@@ -177,7 +176,6 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	}
 
 	public void setCell(int x, int y) {
-
 		if(editType == CellType.CAR){
 			MovingObject obj = editType.getMovingObject(editDirection);
 			obj.setPosition(x,y);
@@ -188,12 +186,16 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 			movingObjects[x][y] = obj;
 		} else {
 			points[x][y] = editType.getObject();
-		}
 
-		if (points[x][y] instanceof IterablePoint point){
-			point.setPosition(x, y);
-			point.setBoard(this);
-			iterablePoints[x][y] = point;
+			if (points[x][y] instanceof IterablePoint point){
+				point.setPosition(x, y);
+				point.setBoard(this);
+				iterablePoints[x][y] = point;
+			}
+
+			if (points[x][y] instanceof Drivable drivable){
+				drivable.setDirectionChances(editDirectionPercents);
+			}
 		}
 
 		this.repaint();
