@@ -17,7 +17,7 @@ public enum BoardDirection {
         };
     }
 
-// Does not work on windows
+// Does not work on Windows
 //    public char getChar(){
 //        return switch (this){
 //            case TOP -> '↑';
