@@ -87,6 +87,15 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		this.repaint();
 	}
 
+	public void clearMovingObjects(){
+		for (int x = 0; x < getPointsLength(); ++x){
+			for (int y = 0; y < getPointsHeight(); y++){
+				removeMovingObjectsAt(x, y);
+			}
+		}
+		this.repaint();
+	}
+
 	private void initialize(int length, int height) {
 		points = new Point[length][height];
 		movingObjects = new MovingObject[length][height];

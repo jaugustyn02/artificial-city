@@ -17,7 +17,7 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 	@Serial private static final long serialVersionUID = 1L;
 	private final Timer timer;
 	private Board board;
-	private JButton start, clear, load, save, edit, file, saveChances, resetChances, clearChances;
+	private JButton start, clear, load, save, edit, file, saveChances, resetChances, clearChances, clearObjects;
 	private JComboBox<CellType> drawType;
 	private JSlider pred;
 	private JTextField[][] pathChoices;
@@ -76,9 +76,12 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 		drawType.addActionListener(this);
 		drawType.setActionCommand("drawType");
 
-		clear = new JButton("Clear");
+		clear = new JButton("Clear All");
 		clear.setActionCommand("clear");
 		clear.addActionListener(this);
+		clear.setBorder(BorderFactory.createCompoundBorder(
+				clear.getBorder(),
+				BorderFactory.createEmptyBorder(0, -5, 0, -5)));
 
 		saveChances = new JButton("Save chances");
 		saveChances.setActionCommand("save chances");
@@ -95,6 +98,13 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 		clearChances = new JButton("Clear");
 		clearChances.setActionCommand("clear chances");
 		clearChances.addActionListener(this);
+
+		clearObjects = new JButton("Clear Objects");
+		clearObjects.setActionCommand("clear objects");
+		clearObjects.addActionListener(this);
+		clearObjects.setBorder(BorderFactory.createCompoundBorder(
+				clearObjects.getBorder(),
+				BorderFactory.createEmptyBorder(0, -5, 0, -5)));
 
 		pathChoices = new JTextField[BoardDirection.values().length][BoardDirection.values().length];
 		for (int i=0; i < BoardDirection.values().length; i++){
@@ -131,6 +141,7 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 		editPanel.add(clearChances);
 		editPanel.add(saveChances);
 		editPanel.add(clear);
+		editPanel.add(clearObjects);
 
 		layout.putConstraint(SpringLayout.NORTH, type, 10, SpringLayout.NORTH, editPanel);
 		layout.putConstraint(SpringLayout.WEST, type, 10, SpringLayout.WEST, editPanel);
@@ -173,6 +184,9 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 
 		layout.putConstraint(SpringLayout.SOUTH, clear, -10, SpringLayout.SOUTH, editPanel);
 		layout.putConstraint(SpringLayout.WEST, clear, 10, SpringLayout.WEST, editPanel);
+
+		layout.putConstraint(SpringLayout.SOUTH, clearObjects, -10, SpringLayout.SOUTH, editPanel);
+		layout.putConstraint(SpringLayout.WEST, clearObjects, 80, SpringLayout.WEST, clear);
 
 //----------------------------------------------filePanel----------------------------------------------
 
@@ -310,6 +324,9 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 					break;
 				case "clear chances":
 					clearChances();
+					break;
+				case "clear objects":
+					board.clearMovingObjects();
 					break;
 			}
 		}
