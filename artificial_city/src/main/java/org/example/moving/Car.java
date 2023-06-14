@@ -6,6 +6,8 @@ import org.example.Point;
 import org.example.cells.CellType;
 import org.example.cells.Drivable;
 import org.example.helpers.Vector2D;
+import org.example.iterable.CarExit;
+
 
 
 public class Car extends MovingObject{
@@ -38,24 +40,46 @@ public class Car extends MovingObject{
 
     public void slowDown(Point[][] points,MovingObject[][] movingObjects ) {
 
+        BoardDirection driveDirection = this.direction;
         int distanceToNextCar = 0;
         Vector2D pos = new Vector2D(x,y);
         int maxVelocity = velocity;
+
+        boolean changedDirection = false;
+
         while (distanceToNextCar < velocity){
             pos = pos.add(direction.getVector());
             MovingObject obj = movingObjects[pos.x()][pos.y()];
             Point point = points[pos.x()][pos.y()];
 
-            if(obj != null || !(point instanceof Drivable)){
+            if(obj != null || !(point instanceof Drivable d) || !d.canDriveThrough()){
+                if(point instanceof CarExit exit){
+                    exit.removeCar(new Vector2D(x,y));
+                }
+                maxVelocity = distanceToNextCar;
+
+                break;
+            }
+            distanceToNextCar++;
+
+            driveDirection = d.getDriveDirection(this.direction);
+            if (driveDirection == null){
+                driveDirection = this.direction;
+            }
+            if (driveDirection != this.direction){
+                changedDirection = true;
                 maxVelocity = distanceToNextCar;
                 break;
             }
-
-            distanceToNextCar++;
         }
         Vector2D toAdd = direction.getVector().multiply(maxVelocity);
         nextPosition = new Vector2D(x,y).add(toAdd);
         velocity = maxVelocity;
+
+        if(changedDirection){
+            velocity = 0;
+            this.direction = driveDirection;
+        }
 
     }
 
@@ -65,25 +89,9 @@ public class Car extends MovingObject{
         }
     }
 
-    public void changeLane(Point newPoint){
-
-    }
+    public void changeLane(Point newPoint){}
     public void move(){
         x = nextPosition.x();
         y = nextPosition.y();
     }
-//    public void moveCar(Point newPoint, boolean exceededPeriodicBoundaries){
-//        if (numOfMovesOnNewLane == numOfMovesBeforeColorReset){
-//            currentColorID = defaultColorID;
-//        }
-//        if (!hasMoved && velocity > 0) {
-//            if (!exceededPeriodicBoundaries || Math.random() > disappearChance) {
-//                newPoint.velocity = velocity;
-//                newPoint.hasMoved = true;
-//                newPoint.currentColorID = currentColorID;
-//                newPoint.numOfMovesOnNewLane = numOfMovesOnNewLane + 1;
-//            }
-//            clear();
-//        }
-//    }
 }

@@ -4,15 +4,14 @@ import org.example.cells.CellType;
 import org.example.moving.BoardDirection;
 
 
-public abstract class MovingObject {
+public abstract class MovingObject extends Point {
     protected int x;
     protected int y;
     protected int velocity = 0;
-    protected CellType type;
     protected BoardDirection direction;
 
     public MovingObject(CellType type){
-        this.type = type;
+        super(type);
     }
     public abstract void iterate(Point[][] points, MovingObject[][] movingObjects);
     public abstract void move();
@@ -29,5 +28,10 @@ public abstract class MovingObject {
 
     public void setVelocity(int velocity){
         this.velocity = velocity;
+    }
+
+    @Override
+    public String getInfo(){
+        return super.getInfo() + ", direction: "+direction+", velocity: "+velocity;
     }
 }

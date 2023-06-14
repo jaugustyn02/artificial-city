@@ -11,12 +11,9 @@ public class Point {
 	public Point(CellType type) {
 		this.type = type;
 	}
-	public void clicked() {
-	}
-	
-	public void clear() {
-	}
 
-
+	public String getInfo(){
+		return "type: " + type;
+	}
 
 }

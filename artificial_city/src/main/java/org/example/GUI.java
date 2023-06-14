@@ -1,55 +1,194 @@
 package org.example;
 
 import org.example.cells.CellType;
+import org.example.moving.BoardDirection;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dimension;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
+import java.io.Serial;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+
 public class GUI extends JPanel implements ActionListener, ChangeListener {
-	private static final long serialVersionUID = 1L;
-	private Timer timer;
+	@Serial private static final long serialVersionUID = 1L;
+	private final Timer timer;
 	private Board board;
-	private JButton start;
-	private JButton clear;
-	private JButton load;
-	private JButton save;
+	private JButton start, clear, load, save, edit, file, saveChances, resetChances, clearChances, clearObjects;
 	private JComboBox<CellType> drawType;
 	private JSlider pred;
+	private JTextField[][] pathChoices;
 	private JTextField fileName;
-	private JFrame frame;
+	private final JFrame frame;
 	private JComboBox<String> filesToLoad;
+	private JPanel editPanel, filePanel;
 	private int iterNum = 0;
 	private final int maxDelay = 500;
-	private final int initDelay = 100;
 	private boolean running = false;
+	private static final int numOfDirections = BoardDirection.values().length;
 
 	public GUI(JFrame jf) {
 		frame = jf;
+		int initDelay = 100;
 		timer = new Timer(initDelay, this);
 		timer.stop();
 	}
 
 	public void initialize(Container container) {
 		container.setLayout(new BorderLayout());
-		container.setSize(new Dimension(1024, 768));
 
-		JPanel buttonPanel = new JPanel();
+//----------------------------------------------buttonPanel----------------------------------------------
 
 		start = new JButton("Start");
 		start.setActionCommand("Start");
 		start.addActionListener(this);
 
-		clear = new JButton("Clear");
+		pred = new JSlider();
+		pred.setMinimum(0);
+		pred.setMaximum(maxDelay);
+		pred.addChangeListener(this);
+		pred.setValue(maxDelay - timer.getDelay());
+
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.add(start);
+		buttonPanel.add(pred);
+
+//----------------------------------------------toolBar----------------------------------------------
+
+		file = new JButton("File");
+		file.setActionCommand("file");
+		file.addActionListener(this);
+
+		edit = new JButton("Edit");
+		edit.setActionCommand("edit");
+		edit.addActionListener(this);
+
+		JToolBar toolBar = new JToolBar();
+		toolBar.add(file);
+		toolBar.add(edit);
+
+//----------------------------------------------editPanel----------------------------------------------
+
+		drawType = new JComboBox<>(CellType.values());
+		drawType.addActionListener(this);
+		drawType.setActionCommand("drawType");
+
+		clear = new JButton("Clear All");
 		clear.setActionCommand("clear");
 		clear.addActionListener(this);
+		clear.setBorder(BorderFactory.createCompoundBorder(
+				clear.getBorder(),
+				BorderFactory.createEmptyBorder(0, -5, 0, -5)));
+
+		saveChances = new JButton("Save chances");
+		saveChances.setActionCommand("save chances");
+		saveChances.addActionListener(this);
+
+		saveChances = new JButton("Save chances");
+		saveChances.setActionCommand("save chances");
+		saveChances.addActionListener(this);
+
+		resetChances = new JButton("Reset");
+		resetChances.setActionCommand("reset chances");
+		resetChances.addActionListener(this);
+
+		clearChances = new JButton("Clear");
+		clearChances.setActionCommand("clear chances");
+		clearChances.addActionListener(this);
+
+		clearObjects = new JButton("Clear Objects");
+		clearObjects.setActionCommand("clear objects");
+		clearObjects.addActionListener(this);
+		clearObjects.setBorder(BorderFactory.createCompoundBorder(
+				clearObjects.getBorder(),
+				BorderFactory.createEmptyBorder(0, -5, 0, -5)));
+
+		pathChoices = new JTextField[BoardDirection.values().length][BoardDirection.values().length];
+		for (int i=0; i < BoardDirection.values().length; i++){
+			for (int j=0; j < BoardDirection.values().length; j++){
+				pathChoices[i][j] = new JTextField("0");
+				pathChoices[i][j].setPreferredSize(new Dimension(26, 22));
+			}
+		}
+
+		SpringLayout layout = new SpringLayout();
+
+		JLabel type = new JLabel("Edit Type:");
+		JLabel road = new JLabel("Road driving path chances:");
+		JLabel from = new JLabel("From\\To");
+		JLabel[] fromDirections = {new JLabel("\uD83E\uDC81"), new JLabel("\uD83E\uDC7A"), new JLabel("\uD83E\uDC7B"), new JLabel("\uD83E\uDC78")};
+		JLabel[] toDirections = {new JLabel("\uD83E\uDC81"), new JLabel("\uD83E\uDC7A"), new JLabel("\uD83E\uDC7B"), new JLabel("\uD83E\uDC78")};
+
+		editPanel = new JPanel();
+		editPanel.setLayout(layout);
+		editPanel.setPreferredSize(new Dimension(200, container.getHeight()));
+		editPanel.setVisible(false);
+		editPanel.add(type);
+		editPanel.add(drawType);
+		editPanel.add(road);
+		editPanel.add(from);
+		for (JLabel label: fromDirections) editPanel.add(label);
+		for (JLabel label: toDirections) editPanel.add(label);
+		for (int i=0; i < BoardDirection.values().length; i++){
+			for (int j=0; j < BoardDirection.values().length; j++){
+				editPanel.add(pathChoices[i][j]);
+			}
+		}
+		editPanel.add(resetChances);
+		editPanel.add(clearChances);
+		editPanel.add(saveChances);
+		editPanel.add(clear);
+		editPanel.add(clearObjects);
+
+		layout.putConstraint(SpringLayout.NORTH, type, 10, SpringLayout.NORTH, editPanel);
+		layout.putConstraint(SpringLayout.WEST, type, 10, SpringLayout.WEST, editPanel);
+
+		layout.putConstraint(SpringLayout.NORTH,drawType, 25, SpringLayout.NORTH, type);
+		layout.putConstraint(SpringLayout.WEST, drawType, 10, SpringLayout.WEST, editPanel);
+
+		layout.putConstraint(SpringLayout.NORTH, road, 50, SpringLayout.NORTH, drawType);
+		layout.putConstraint(SpringLayout.WEST, road, 10, SpringLayout.WEST, editPanel);
+
+		layout.putConstraint(SpringLayout.NORTH, from, 10, SpringLayout.SOUTH, road);
+		layout.putConstraint(SpringLayout.WEST, from, 10, SpringLayout.WEST, editPanel);
+
+		for (int i=0; i<toDirections.length; i++){
+			layout.putConstraint(SpringLayout.NORTH, toDirections[i], -16, SpringLayout.SOUTH, from);
+			layout.putConstraint(SpringLayout.WEST, toDirections[i], 30*i + 58, SpringLayout.WEST, from);
+		}
+
+		layout.putConstraint(SpringLayout.NORTH, fromDirections[0], 10, SpringLayout.SOUTH, from);
+		layout.putConstraint(SpringLayout.WEST, fromDirections[0], 20, SpringLayout.WEST, editPanel);
+		for (int i=1; i<fromDirections.length; i++){
+			layout.putConstraint(SpringLayout.NORTH, fromDirections[i], 10, SpringLayout.SOUTH, fromDirections[i-1]);
+			layout.putConstraint(SpringLayout.WEST, fromDirections[i], 20, SpringLayout.WEST, editPanel);
+		}
+		for (int i=0; i < BoardDirection.values().length; i++){
+			for (int j=0; j < BoardDirection.values().length; j++){
+				layout.putConstraint(SpringLayout.NORTH, pathChoices[i][j], 25*i + 10, SpringLayout.SOUTH, from);
+				layout.putConstraint(SpringLayout.WEST, pathChoices[i][j], 30*j + 63, SpringLayout.WEST, editPanel);
+			}
+		}
+
+		layout.putConstraint(SpringLayout.NORTH, resetChances, 30, SpringLayout.NORTH, pathChoices[3][3]);
+		layout.putConstraint(SpringLayout.WEST, resetChances, 46, SpringLayout.WEST, editPanel);
+
+		layout.putConstraint(SpringLayout.NORTH, clearChances, 30, SpringLayout.NORTH, pathChoices[3][3]);
+		layout.putConstraint(SpringLayout.WEST, clearChances, 70, SpringLayout.WEST, resetChances);
+
+		layout.putConstraint(SpringLayout.NORTH, saveChances, 35, SpringLayout.NORTH, resetChances);
+		layout.putConstraint(SpringLayout.EAST, saveChances, -20, SpringLayout.EAST, editPanel);
+
+		layout.putConstraint(SpringLayout.SOUTH, clear, -10, SpringLayout.SOUTH, editPanel);
+		layout.putConstraint(SpringLayout.WEST, clear, 10, SpringLayout.WEST, editPanel);
+
+		layout.putConstraint(SpringLayout.SOUTH, clearObjects, -10, SpringLayout.SOUTH, editPanel);
+		layout.putConstraint(SpringLayout.WEST, clearObjects, 80, SpringLayout.WEST, clear);
+
+//----------------------------------------------filePanel----------------------------------------------
 
 		load = new JButton("Load");
 		load.setActionCommand("load");
@@ -59,83 +198,136 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 		save.setActionCommand("save");
 		save.addActionListener(this);
 
-		pred = new JSlider();
-		pred.setMinimum(0);
-		pred.setMaximum(maxDelay);
-		pred.addChangeListener(this);
-		pred.setValue(maxDelay - timer.getDelay());
-		
-		drawType = new JComboBox<CellType>(CellType.values());
-		drawType.addActionListener(this);
-		drawType.setActionCommand("drawType");
-
 		fileName = new JTextField("");
-		fileName.setPreferredSize(new Dimension(100, 25));
+		fileName.setPreferredSize(new Dimension(150, 30));
+		fileName.setFont(new Font("Siema", Font.PLAIN, 12));
 		fileName.setBorder(BorderFactory.createCompoundBorder(
 				fileName.getBorder(),
 				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
 		filesToLoad = new JComboBox<>(FileHandler.getFilenamesToLoad());
+		filesToLoad.setSelectedIndex(0);
 
+		SpringLayout layout2 = new SpringLayout();
 
-		buttonPanel.add(start);
-		buttonPanel.add(clear);
-		buttonPanel.add(drawType);
-		buttonPanel.add(pred);
-		buttonPanel.add(load);
-		buttonPanel.add(filesToLoad);
-		buttonPanel.add(save);
-		buttonPanel.add(fileName);
+		filePanel = new JPanel();
+		filePanel.setLayout(layout2);
+		filePanel.setPreferredSize(new Dimension(200, container.getHeight()));
+		filePanel.setVisible(false);
+		filePanel.add(filesToLoad);
+		filePanel.add(load);
+		filePanel.add(fileName);
+		filePanel.add(save);
 
-		board = new Board(1024, 768 - buttonPanel.getHeight());
+		layout2.putConstraint(SpringLayout.NORTH, filesToLoad, 10, SpringLayout.NORTH, filePanel);
+		layout2.putConstraint(SpringLayout.WEST, filesToLoad, 10, SpringLayout.WEST, filePanel);
+
+		layout2.putConstraint(SpringLayout.NORTH, load, 10, SpringLayout.SOUTH, filesToLoad);
+		layout2.putConstraint(SpringLayout.WEST, load, 10, SpringLayout.WEST, filePanel);
+
+		layout2.putConstraint(SpringLayout.NORTH, fileName, 10, SpringLayout.SOUTH, load);
+		layout2.putConstraint(SpringLayout.WEST, fileName, 10, SpringLayout.WEST, filePanel);
+
+		layout2.putConstraint(SpringLayout.NORTH, save, 10, SpringLayout.SOUTH, fileName);
+		layout2.putConstraint(SpringLayout.WEST, save, 10, SpringLayout.WEST, filePanel);
+
+//----------------------------------------------container----------------------------------------------
+
+		board = new Board(0, 0);
 		container.add(board, BorderLayout.CENTER);
+		container.add(toolBar, BorderLayout.NORTH);
+		container.add(editPanel, BorderLayout.EAST);
+		container.add(filePanel, BorderLayout.WEST);
 		container.add(buttonPanel, BorderLayout.SOUTH);
+
+//----------------------------------------------rest---------------------------------------------------
+		saveChances.doClick(); // initialize chances
 	}
 
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource().equals(timer)) {
 			iterNum++;
-			frame.setTitle("Artificial City simulation (" + Integer.toString(iterNum) + " iteration)");
+			frame.setTitle("Artificial City simulation (" + iterNum + " iteration)");
 			board.iteration();
 		} else {
 			String command = e.getActionCommand();
-			if (command.equals("Start")) {
-				if (!running) {
-					timer.start();
-					start.setText("Pause");
-				} else {
-					timer.stop();
-					start.setText("Start");
-				}
-				running = !running;
-				clear.setEnabled(true);
-
-			} else if (command.equals("clear")) {
-				iterNum = 0;
-				timer.stop();
-				start.setEnabled(true);
-				board.clear();
-				frame.setTitle("Artificial City simulation");
-			}
-			else if (command.equals("drawType")){
-				CellType newType = (CellType)drawType.getSelectedItem();
-				System.out.println(newType);
-				board.editType = newType;
-			} else if (command.equals("save")) {
-				if (!running) {
-					board.save(fileName.getText());
-					frame.setTitle("Artificial City simulation - saved to: " + fileName.getText());
-				}
-			} else if (command.equals("load")) {
-				if (!running) {
+			switch (command) {
+				case "Start":
+					if (!running) {
+						timer.start();
+						start.setText("Pause");
+					} else {
+						timer.stop();
+						start.setText("Start");
+						CellType newType = (CellType) drawType.getSelectedItem();
+						System.out.println("Edit type: "+newType);
+						board.editType = newType;
+					}
+					running = !running;
+					clear.setEnabled(true);
+					break;
+				case "clear":
 					iterNum = 0;
 					timer.stop();
 					start.setEnabled(true);
-					String loadFileName = (String)filesToLoad.getSelectedItem();
 					board.clear();
-					board.load(loadFileName);
-					frame.setTitle("Artificial City simulation - loaded: " + loadFileName);
-				}
+					frame.setTitle("Artificial City simulation");
+					break;
+				case "drawType":
+					CellType newType = (CellType) drawType.getSelectedItem();
+					System.out.println("Edit type: "+newType);
+					board.editType = newType;
+					break;
+				case "save":
+					if (!running) {
+						board.save(fileName.getText());
+						frame.setTitle("Artificial City simulation - saved to: " + fileName.getText());
+					}
+					break;
+				case "load":
+					if (!running) {
+						iterNum = 0;
+						timer.stop();
+						start.setEnabled(true);
+						String loadFileName = (String) filesToLoad.getSelectedItem();
+						board.clear();
+						board.load(loadFileName);
+						fileName.setText(loadFileName);
+						frame.setTitle("Artificial City simulation - loaded: " + loadFileName);
+					}
+					break;
+				case "save chances":
+					for (int row = 0; row < numOfDirections; row++) {
+						if (!isValidChanceRow(row))
+							resetChancesRow(row);
+
+						for (int col = 0; col < numOfDirections; col++) {
+							int chance = Integer.parseInt(pathChoices[row][col].getText());
+							BoardDirection from = BoardDirection.values()[row];
+							BoardDirection to = BoardDirection.values()[col];
+							board.editChances.setChanceFromTo(from, to, chance);
+						}
+					}
+					break;
+				case "edit":
+					if(!filePanel.isVisible())
+						board.resizingActive = !board.resizingActive;
+					editPanel.setVisible(!editPanel.isVisible());
+					break;
+				case "file":
+					if(!editPanel.isVisible())
+						board.resizingActive = !board.resizingActive;
+					filePanel.setVisible(!filePanel.isVisible());
+					break;
+				case "reset chances":
+					resetChances();
+					break;
+				case "clear chances":
+					clearChances();
+					break;
+				case "clear objects":
+					board.clearMovingObjects();
+					break;
 			}
 		}
 	}
@@ -144,7 +336,56 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 		timer.setDelay(maxDelay - pred.getValue());
 	}
 
-	public int getIterNum(){
-		return iterNum;
+	private static boolean isNumeric(String strNum) {
+		if (strNum == null) {
+			return false;
+		}
+		try {
+			Integer.parseInt(strNum);
+		} catch (NumberFormatException nfe) {
+			return false;
+		}
+		return true;
+	}
+
+	private static boolean isValidChance(int num){
+		return num >= 0 && num <= 100;
+	}
+
+	private boolean isValidChanceRow(int row){
+		int sumOfPercents = 0;
+		for(int col = 0; col < numOfDirections; col++){
+			String text = pathChoices[row][col].getText();
+			if (!isNumeric(text))
+				return false;
+			int chance = Integer.parseInt(text);
+			if (!isValidChance(chance))
+				return false;
+			sumOfPercents += chance;
+		}
+		return (sumOfPercents == 100);
+	}
+
+	private void resetChancesRow(int row){
+		for (int col = 0; col < numOfDirections; col++){
+			if (col == row)
+				pathChoices[row][col].setText("100");
+			else
+				pathChoices[row][col].setText("0");
+		}
+	}
+
+	private void resetChances(){
+		for(int row=0; row < numOfDirections; row++){
+			resetChancesRow(row);
+		}
+	}
+
+	private void clearChances(){
+		for(int row=0; row < numOfDirections; row++) {
+			for (int col = 0; col < numOfDirections; col++) {
+				pathChoices[row][col].setText("0");
+			}
+		}
 	}
 }

@@ -13,7 +13,6 @@ public class Program extends JFrame {
 
 		gof = new GUI(this);
 		gof.initialize(this.getContentPane());
-//		this.setSize(1024, 768);
 		this.setSize(1440, 720);
 		this.setVisible(true);
 	}

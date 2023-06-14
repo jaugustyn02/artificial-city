@@ -14,6 +14,7 @@ import java.awt.*;
 
 
 public enum CellType {
+    SELECT,
     NOT_SPECIFIED,
     CAR,
     PEDESTRIAN,
@@ -52,10 +53,11 @@ public enum CellType {
 
    public Point getObject(){
        return switch (this) {
+           case SELECT -> null;
            case ROAD -> new Road();
            case SIDEWALK -> new Sidewalk();
            case CROSSING -> new Crossing();
-           case LIGHTS -> new Lights();
+//           case LIGHTS -> new Lights();
            case GRASS -> new Grass();
            case TREE -> new Tree();
            case BUILDING -> new Building();
@@ -65,7 +67,6 @@ public enum CellType {
            case PEDESTRIAN_EXIT -> new PedestrianExit();
            case PEDESTRIAN_ENTRANCE -> new PedestrianEntrance();
            default -> new Point();
-
        };
    }
 
