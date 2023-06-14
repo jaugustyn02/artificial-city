@@ -1,11 +1,9 @@
 package org.example;
 
 import org.example.cells.*;
-import org.example.iterable.CarEntrance;
-import org.example.iterable.CarExit;
+import org.example.iterable.DrivingPathChances;
 import org.example.iterable.IterablePoint;
 import org.example.moving.BoardDirection;
-import org.example.moving.Direction;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -34,12 +32,11 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	final public int size = 10;
 	public CellType editType = CellType.NOT_SPECIFIED;
 	public FileHandler fileHandler = new FileHandler(this);
-
 	public BoardDirection editDirection = BoardDirection.RIGHT;
-	public int[] editDirectionPercents = {0, 0, 0, 0};
-
+	public DrivingPathChances editChances = new DrivingPathChances();
 	private int length;
 	private int height;
+	public boolean resizingActive = true;
 
 	public Board(int length, int height) {
 		initialize(length, height);
@@ -50,8 +47,6 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		addMouseMotionListener(this);
 		setBackground(Color.WHITE);
 		setOpaque(true);
-		System.out.println(length);
-		System.out.println(height);
 	}
 
 	public void iteration() {
@@ -86,6 +81,7 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		for (int x = 0; x < points.length; ++x) {
 			for (int y = 0; y < points[0].length; ++y) {
 				points[x][y] = CellType.NOT_SPECIFIED.getObject();
+				removeMovingObjectsAt(x, y);
 			}
 		}
 		this.repaint();
@@ -104,7 +100,8 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 
 	private void initializeNewPoints(int length, int height) {
 		Point[][] new_points = new Point[length][height];
-		System.out.println("New points: "+length+" "+height);
+		MovingObject[][] new_movingObjects = new MovingObject[length][height];
+		IterablePoint[][] new_iterablePoints = new IterablePoint[length][height];
 		this.length = length;
 		this.height = height;
 
@@ -185,6 +182,8 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 			obj.setPosition(x,y);
 			movingObjects[x][y] = obj;
 		} else {
+			System.out.println("[POINT PLACED] - pos: ("+x+", "+y+"), type: "+editType.name());
+
 			points[x][y] = editType.getObject();
 
 			if (points[x][y] instanceof IterablePoint point){
@@ -194,7 +193,8 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 			}
 
 			if (points[x][y] instanceof Drivable drivable){
-				drivable.setDirectionChances(editDirectionPercents);
+				drivable.setDrivingPathChances(editChances);
+				System.out.println("- Road chances: "+drivable.getDrivingPathChances());
 			}
 		}
 
@@ -202,11 +202,12 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	}
 
 	public void componentResized(ComponentEvent e) {
-		int length = (this.getWidth() / size) + 1;
-		int height = (this.getHeight() / size) + 1;
-//		initialize(dlugosc, wysokosc);
-		initializeNewPoints(length, height);
-		System.out.println(this.length);
+		if (resizingActive) {
+			System.out.println("Resized: "+getWidth()+" "+getHeight());
+			int length = (this.getWidth() / size) + 1;
+			int height = (this.getHeight() / size) + 1;
+			initializeNewPoints(length, height);
+		}
 	}
 
 	public void mouseDragged(MouseEvent e) {
@@ -215,41 +216,15 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		setCell(x, y);
 	}
 
-	public void mouseExited(MouseEvent e) {
-	}
-
-	public void mouseEntered(MouseEvent e) {
-	}
-
-	public void componentShown(ComponentEvent e) {
-	}
-
-	public void componentMoved(ComponentEvent e) {
-	}
-
-	public void mouseReleased(MouseEvent e) {
-	}
-
-	public void mouseMoved(MouseEvent e) {
-	}
-
-	public void componentHidden(ComponentEvent e) {
-	}
-
-	public void mousePressed(MouseEvent e) {
-	}
-
 	public void save(String filePath){
 		fileHandler.saveMap(points, filePath);
 	}
 
 	public void load(String fileName){
-		int[] size = new int[2];
-		size[0] = points.length;
-		size[1] = points[0].length;
-		fileHandler.loadMap(size, fileName);
+		fileHandler.loadMap(fileName);
 		this.repaint();
 	}
+
 	private MovingObject[] getMovingObjects1d(){
 		return Arrays.stream(movingObjects).flatMap(Stream::of).filter(Objects::nonNull).toArray(MovingObject[]::new);
 	}
@@ -270,4 +245,22 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		movingObjects[x][y] = null;
 	}
 
+	public int getPointsLength(){
+		return points.length;
+	}
+	public int getPointsHeight(){
+		if (points.length > 0)
+			return points[0].length;
+		return 0;
+	}
+
+// ------------------------------------------------------------------------------
+	public void mouseExited(MouseEvent e) {}
+	public void mouseEntered(MouseEvent e) {}
+	public void componentShown(ComponentEvent e) {}
+	public void componentMoved(ComponentEvent e) {}
+	public void mouseReleased(MouseEvent e) {}
+	public void mouseMoved(MouseEvent e) {}
+	public void componentHidden(ComponentEvent e) {}
+	public void mousePressed(MouseEvent e) {}
 }

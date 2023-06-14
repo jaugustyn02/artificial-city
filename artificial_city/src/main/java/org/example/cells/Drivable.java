@@ -1,9 +1,8 @@
 package org.example.cells;
 
+import org.example.iterable.DrivingPathChances;
 import org.example.moving.BoardDirection;
-import org.example.moving.Direction;
 
-import java.util.List;
 
 public interface Drivable {
 //    Lights lightsController = null;
@@ -11,11 +10,8 @@ public interface Drivable {
 
     boolean canDriveThrough();
 
-    public List<BoardDirection> getAvailableDirections();
+    BoardDirection getDriveDirection(BoardDirection from);
 
-    public BoardDirection getDriveDirection();
-
-    public void setDirectionChances(int[] chances);
-
-    public int[] getDrivableChances();
+    DrivingPathChances getDrivingPathChances();
+    void setDrivingPathChances(DrivingPathChances chances);
 }

@@ -1,13 +1,15 @@
 package org.example.cells;
 
 import org.example.Point;
+import org.example.iterable.DrivingPathChances;
 import org.example.moving.BoardDirection;
 
 import java.util.List;
 import java.util.Random;
 
 public class Crossing extends Point implements Drivable, Walkable{
-    private int[] directionChances = new int[BoardDirection.values().length];
+    private DrivingPathChances chances = new DrivingPathChances();
+//    private int[] directionChances = new int[BoardDirection.values().length];
     private Lights lightsController = null;
     public Crossing(){
         super(CellType.CROSSING);
@@ -24,17 +26,13 @@ public class Crossing extends Point implements Drivable, Walkable{
     }
 
     @Override
-    public List<BoardDirection> getAvailableDirections(){
-        return null;
-    }
-
-    @Override
-    public BoardDirection getDriveDirection(){
+    public BoardDirection getDriveDirection(BoardDirection from) {
+        List<Integer> directionChances = chances.getChancesFrom(from).values().stream().toList();
         Random rand = new Random();
         int percent = rand.nextInt(100);
         int index = 0;
-        for (int chance: directionChances){
-            if (percent < chance){
+        for (int chance: directionChances) {
+            if (percent < chance) {
                 return BoardDirection.values()[index];
             }
             percent -= chance;
@@ -44,12 +42,12 @@ public class Crossing extends Point implements Drivable, Walkable{
     }
 
     @Override
-    public void setDirectionChances(int[] chances){
-        System.arraycopy(chances, 0, directionChances, 0, BoardDirection.values().length);
+    public DrivingPathChances getDrivingPathChances() {
+        return chances;
     }
 
     @Override
-    public int[] getDrivableChances(){
-        return directionChances;
+    public void setDrivingPathChances(DrivingPathChances chances) {
+        this.chances = chances;
     }
 }

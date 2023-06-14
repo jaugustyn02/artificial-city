@@ -1,18 +1,15 @@
 package org.example.cells;
 
 import org.example.Point;
+import org.example.iterable.DrivingPathChances;
 import org.example.moving.BoardDirection;
-import org.example.moving.Direction;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Road extends Point implements Drivable {
-//    private List<BoardDirection>  availableDirections = new ArrayList<>();
-    private int[] directionChances = new int[BoardDirection.values().length];
-    private List<BoardDirection> availableOvertakingDirections = new ArrayList<>();
+//    private List<BoardDirection> availableOvertakingDirections = new ArrayList<>();
+
+    private DrivingPathChances chances = new DrivingPathChances();
 
     private Lights lightsController = null;
     public Road(){
@@ -25,10 +22,7 @@ public class Road extends Point implements Drivable {
             return true;
         }
 
-        if(lightsController.getLightColor() == LightColor.GREEN){
-            return true;
-        }
-        return false;
+        return lightsController.getLightColor() == LightColor.GREEN;
     }
 
     @Override
@@ -37,34 +31,28 @@ public class Road extends Point implements Drivable {
     }
 
     @Override
-    public List<BoardDirection> getAvailableDirections() {
-        return null;
-    }
-
-    @Override
-    public BoardDirection getDriveDirection() {
+    public BoardDirection getDriveDirection(BoardDirection from) {
         Random rand = new Random();
         int percent = rand.nextInt(100);
-        int index = 0;
-        for (int chance: directionChances) {
+        for (BoardDirection to: BoardDirection.values()) {
+            int chance = getDrivingPathChances().getChancesFromTo(from, to);
             if (percent < chance) {
-                System.out.println("Returns: "+BoardDirection.values()[index]);
-                return BoardDirection.values()[index];
+                System.out.println("Returned: "+to);
+                return to;
             }
             percent -= chance;
-            ++index;
         }
         return null; // no available direction or error
     }
 
     @Override
-    public void setDirectionChances(int[] chances){
-        System.arraycopy(chances, 0, directionChances, 0, BoardDirection.values().length);
-        System.out.println(Arrays.toString(directionChances));
+    public DrivingPathChances getDrivingPathChances() {
+        return chances;
     }
 
     @Override
-    public int[] getDrivableChances(){
-        return directionChances;
+    public void setDrivingPathChances(DrivingPathChances chances) {
+        this.chances = new DrivingPathChances(chances);
     }
+
 }

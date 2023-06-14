@@ -17,12 +17,13 @@ public enum BoardDirection {
         };
     }
 
-    public char getChar(){
-        return switch (this){
-            case TOP -> '↑';
-            case LEFT -> '←';
-            case BOTTOM -> '↓';
-            case RIGHT -> '→';
-        };
-    }
+// Does not work on windows
+//    public char getChar(){
+//        return switch (this){
+//            case TOP -> '↑';
+//            case LEFT -> '←';
+//            case BOTTOM -> '↓';
+//            case RIGHT -> '→';
+//        };
+//    }
 }

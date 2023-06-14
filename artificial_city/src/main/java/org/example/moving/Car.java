@@ -8,7 +8,6 @@ import org.example.cells.Drivable;
 import org.example.helpers.Vector2D;
 import org.example.iterable.CarExit;
 
-import java.util.List;
 
 
 public class Car extends MovingObject{
@@ -63,7 +62,7 @@ public class Car extends MovingObject{
             }
             distanceToNextCar++;
 
-            driveDirection = d.getDriveDirection();
+            driveDirection = d.getDriveDirection(this.direction);
             if (driveDirection == null){
                 driveDirection = this.direction;
             }
@@ -72,28 +71,6 @@ public class Car extends MovingObject{
                 maxVelocity = distanceToNextCar;
                 break;
             }
-
-//            List<BoardDirection> avDir = d.getAvailableDirections();
-//            if (avDir.size() == 1){
-//                continue;
-//            }
-//            if(avDir.size() == 0){
-//                maxVelocity = distanceToNextCar;
-//                break;
-//            }
-//
-//            int index = (int)(Math.random()*avDir.size());
-//            BoardDirection newDirection = avDir.get(index);
-//            if(newDirection == direction){
-//                continue;
-//            }
-
-//            this.direction = newDirection;
-//            changedDirection = true;
-//            maxVelocity = distanceToNextCar;
-//            break;
-
-
         }
         Vector2D toAdd = direction.getVector().multiply(maxVelocity);
         nextPosition = new Vector2D(x,y).add(toAdd);
@@ -112,9 +89,7 @@ public class Car extends MovingObject{
         }
     }
 
-    public void changeLane(Point newPoint){
-
-    }
+    public void changeLane(Point newPoint){}
     public void move(){
         x = nextPosition.x();
         y = nextPosition.y();

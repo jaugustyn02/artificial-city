@@ -1,17 +1,13 @@
 package org.example;
 
 import org.example.cells.*;
-import org.example.iterable.IterablePoint;
+import org.example.iterable.DrivingPathChances;
 
-import java.awt.event.ComponentEvent;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 import java.util.stream.Stream;
-
-import static java.awt.event.ComponentEvent.COMPONENT_RESIZED;
 
 public class FileHandler {
     private static final String resourcesPath = "src/main/resources/maps/";
@@ -33,25 +29,19 @@ public class FileHandler {
                 .toArray(String[]::new);
     }
 
-    public void saveMap(Point[][] points){
-        this.saveMap(points, defaultFileName);
-    }
-
     public void saveMap(Point[][] points, String fileName){
         int length = points.length;
         int height = points[0].length;
         FileWriter fw;
         try {
             fw = new FileWriter(resourcesPath + fileName);
-
             fw.write(length + ";" + height + "\n");
 
             for (Point[] points_row : points) {
                 for (Point point: points_row) {
                     if (point instanceof Drivable drivable){
                         fw.write(
-                                point.type.ordinal()+":"+
-                                Arrays.toString(drivable.getDrivableChances()).replaceAll("\\s", "")+";"
+                                point.type.ordinal()+":" + drivable.getDrivingPathChances().toString() + ";"
                         );
                     }
                     else {
@@ -66,56 +56,32 @@ public class FileHandler {
             throw new RuntimeException(e);
         }
     }
-
-    public int[] loadSize(){
-        return loadSize(defaultFileName);
-    }
-
-    public int[] loadSize(String fileName){
-        int[] size = new int[2];
-        size[0] = 1024;
-        size[1] = 768;
-        try (BufferedReader br = new BufferedReader(new FileReader(resourcesPath + fileName))) {
-            String[] dimensions = br.readLine().split(";");
-            int length = Integer.parseInt(dimensions[0]);
-            int height = Integer.parseInt(dimensions[1]);
-
-            size[0] = length;
-            size[1] = height;
-
-        } catch (IOException e) {
-            e.printStackTrace();
+    public void loadMap(String fileName){
+        if (Objects.equals(fileName, "")){
+            fileName = defaultFileName;
         }
-        return size;
-    }
 
-    public void loadMap(int[] size){
-        loadMap(size, defaultFileName);
-    }
-    public void loadMap(int[] size, String fileName){
         try (BufferedReader br = new BufferedReader(new FileReader(resourcesPath + fileName))) {
-            String[] dimensions = br.readLine().split(";");
+            String[] size = br.readLine().split(";");
+//            int width = Integer.parseInt(size[0]) * board.size;
+//            int height = Integer.parseInt(size[1]) * board.size;
 
-//            int width = Integer.parseInt(dimensions[0]) * board.size;
-//            int height = Integer.parseInt(dimensions[1]) * board.size;
-//            board.setSize(width, height);
-//            board.componentResized(null);
+            int length = board.getPointsLength();
+            int height = board.getPointsHeight();
 
             String line;
             int i = 0;
             while ((line = br.readLine()) != null) {
                 String[] points = line.split(";");
-                for (int j = 0; j < size[1]; j++) {
-                    if (i < size[0]) {
+                for (int j = 0; j < height; j++) {
+                    if (i < length) {
                         if (j < points.length) {
                             String[] values = points[j].split(":");
                             board.editType = CellType.values()[Integer.parseInt(values[0])];
                             if (board.editType.getObject() instanceof Drivable){
-                                String[] str = values[1].replaceAll("[\\[\\]]", "").split(",");
-                                
-                                for(int i=0; i<)
+                                board.editChances = new DrivingPathChances(values[1]);
                             }
-//                            board.setCell(i, j);
+                            board.setCell(i, j);
                         }
                         else {
                             board.editType = CellType.NOT_SPECIFIED;
@@ -125,8 +91,8 @@ public class FileHandler {
                 }
                 i++;
             }
-            for (int x = i;x < size[0]; x++){
-                for (int y = 0; y < size[1]; y++){
+            for (int x = i;x < length; x++){
+                for (int y = 0; y < height; y++){
                     board.editType = CellType.NOT_SPECIFIED;
                     board.setCell(x, y);
                 }
@@ -211,7 +177,5 @@ public class FileHandler {
 
         controller.initialize(lights, states);
         board.lightsCrossingControllers.add(controller);
-
-//        return points;
     }
 }
