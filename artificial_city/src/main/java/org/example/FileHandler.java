@@ -62,9 +62,7 @@ public class FileHandler {
         }
 
         try (BufferedReader br = new BufferedReader(new FileReader(resourcesPath + fileName))) {
-            String[] size = br.readLine().split(";");
-//            int width = Integer.parseInt(size[0]) * board.size;
-//            int height = Integer.parseInt(size[1]) * board.size;
+            br.readLine(); // read size at 1st line
 
             int length = board.getPointsLength();
             int height = board.getPointsHeight();
@@ -177,5 +175,7 @@ public class FileHandler {
 
         controller.initialize(lights, states);
         board.lightsCrossingControllers.add(controller);
+
+        board.editType = CellType.SELECT;
     }
 }

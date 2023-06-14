@@ -32,4 +32,9 @@ public class Lights extends Point implements Walkable{
     public void setColor(LightColor c) {
         currentState = c;
     }
+
+    @Override
+    public String getInfo(){
+        return super.getInfo() + ", state: "+currentState;
+    }
 }

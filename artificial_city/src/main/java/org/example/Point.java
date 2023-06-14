@@ -1,7 +1,6 @@
 package org.example;
 
 import org.example.cells.CellType;
-import org.example.cells.Drivable;
 
 public class Point {
 	public CellType type;
@@ -12,10 +11,9 @@ public class Point {
 	public Point(CellType type) {
 		this.type = type;
 	}
-	public void clicked() {
-	}
-	
-	public void clear() {
+
+	public String getInfo(){
+		return "type: " + type;
 	}
 
 }

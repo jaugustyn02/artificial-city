@@ -55,4 +55,9 @@ public class Road extends Point implements Drivable {
         this.chances = new DrivingPathChances(chances);
     }
 
+    @Override
+    public String getInfo(){
+        return "type: "+type+", path chances: "+chances;
+    }
+
 }

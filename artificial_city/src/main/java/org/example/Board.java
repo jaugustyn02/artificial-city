@@ -30,7 +30,7 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	public List<Lights> lights = new ArrayList<>();
 	public List<LightsCrossingController> lightsCrossingControllers = new ArrayList<>();
 	final public int size = 10;
-	public CellType editType = CellType.NOT_SPECIFIED;
+	public CellType editType = CellType.SELECT;
 	public FileHandler fileHandler = new FileHandler(this);
 	public BoardDirection editDirection = BoardDirection.RIGHT;
 	public DrivingPathChances editChances = new DrivingPathChances();
@@ -178,7 +178,12 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	public void mouseClicked(MouseEvent e){
 		int x = e.getX() / size;
 		int y = e.getY() / size;
-		setCell(x, y);
+		if (editType == CellType.SELECT){
+			System.out.println("[POINT SELECTED] - {position: ("+x+", "+y+"), "+getCellAt(x, y).getInfo()+"}");
+		}
+		else {
+			setCell(x, y);
+		}
 	}
 
 	public void setCell(int x, int y) {
@@ -191,8 +196,6 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 			obj.setPosition(x,y);
 			movingObjects[x][y] = obj;
 		} else {
-			System.out.println("[POINT PLACED] - pos: ("+x+", "+y+"), type: "+editType.name());
-
 			points[x][y] = editType.getObject();
 
 			if (points[x][y] instanceof IterablePoint point){
@@ -203,8 +206,9 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 
 			if (points[x][y] instanceof Drivable drivable){
 				drivable.setDrivingPathChances(editChances);
-				System.out.println("- Road chances: "+drivable.getDrivingPathChances());
 			}
+
+			System.out.println("[POINT PLACED] - {position: ("+x+", "+y+"), "+getCellAt(x, y).getInfo()+"}");
 		}
 
 		this.repaint();
@@ -220,6 +224,8 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	}
 
 	public void mouseDragged(MouseEvent e) {
+		if (editType == CellType.SELECT)
+			return;
 		int x = e.getX() / size;
 		int y = e.getY() / size;
 		setCell(x, y);
@@ -244,6 +250,17 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 
 	public Point getPointAt(int x, int y){
 		return points[x][y];
+	}
+
+	public Point getCellAt(int x, int y){
+		if (getMovingObjectAt(x, y) != null)
+			return getMovingObjectAt(x, y);
+		for (Lights light: lights){
+			if (light.x == x && light.y == y){
+				return light;
+			}
+		}
+		return getPointAt(x, y);
 	}
 
 	public MovingObject getMovingObjectAt(int x, int y){
