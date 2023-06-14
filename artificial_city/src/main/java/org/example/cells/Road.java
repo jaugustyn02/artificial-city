@@ -7,9 +7,8 @@ import org.example.moving.BoardDirection;
 import java.util.*;
 
 public class Road extends Point implements Drivable {
-//    private List<BoardDirection> availableOvertakingDirections = new ArrayList<>();
-
     private DrivingPathChances chances = new DrivingPathChances();
+//    private List<BoardDirection> availableOvertakingDirections = new ArrayList<>();
 
     private Lights lightsController = null;
     public Road(){
@@ -42,7 +41,8 @@ public class Road extends Point implements Drivable {
             }
             percent -= chance;
         }
-        return null; // no available direction or error
+//        return null; // no available direction or error
+        return from;
     }
 
     @Override

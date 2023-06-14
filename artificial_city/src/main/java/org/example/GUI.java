@@ -6,30 +6,33 @@ import org.example.moving.BoardDirection;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.Serial;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+
 public class GUI extends JPanel implements ActionListener, ChangeListener {
-	private static final long serialVersionUID = 1L;
-	private Timer timer;
+	@Serial private static final long serialVersionUID = 1L;
+	private final Timer timer;
 	private Board board;
-	private JButton start, clear, load, save, edit, file, saveChances;
+	private JButton start, clear, load, save, edit, file, saveChances, resetChances, clearChances;
 	private JComboBox<CellType> drawType;
 	private JSlider pred;
 	private JTextField[][] pathChoices;
 	private JTextField fileName;
-	private JFrame frame;
+	private final JFrame frame;
 	private JComboBox<String> filesToLoad;
 	private JPanel editPanel, filePanel;
 	private int iterNum = 0;
 	private final int maxDelay = 500;
-	private final int initDelay = 100;
 	private boolean running = false;
+	private static final int numOfDirections = BoardDirection.values().length;
 
 	public GUI(JFrame jf) {
 		frame = jf;
+		int initDelay = 100;
 		timer = new Timer(initDelay, this);
 		timer.stop();
 	}
@@ -81,6 +84,18 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 		saveChances.setActionCommand("save chances");
 		saveChances.addActionListener(this);
 
+		saveChances = new JButton("Save chances");
+		saveChances.setActionCommand("save chances");
+		saveChances.addActionListener(this);
+
+		resetChances = new JButton("Reset");
+		resetChances.setActionCommand("reset chances");
+		resetChances.addActionListener(this);
+
+		clearChances = new JButton("Clear");
+		clearChances.setActionCommand("clear chances");
+		clearChances.addActionListener(this);
+
 		pathChoices = new JTextField[BoardDirection.values().length][BoardDirection.values().length];
 		for (int i=0; i < BoardDirection.values().length; i++){
 			for (int j=0; j < BoardDirection.values().length; j++){
@@ -112,6 +127,8 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 				editPanel.add(pathChoices[i][j]);
 			}
 		}
+		editPanel.add(resetChances);
+		editPanel.add(clearChances);
 		editPanel.add(saveChances);
 		editPanel.add(clear);
 
@@ -145,7 +162,13 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 			}
 		}
 
-		layout.putConstraint(SpringLayout.NORTH, saveChances, 30, SpringLayout.NORTH, pathChoices[3][3]);
+		layout.putConstraint(SpringLayout.NORTH, resetChances, 30, SpringLayout.NORTH, pathChoices[3][3]);
+		layout.putConstraint(SpringLayout.WEST, resetChances, 46, SpringLayout.WEST, editPanel);
+
+		layout.putConstraint(SpringLayout.NORTH, clearChances, 30, SpringLayout.NORTH, pathChoices[3][3]);
+		layout.putConstraint(SpringLayout.WEST, clearChances, 70, SpringLayout.WEST, resetChances);
+
+		layout.putConstraint(SpringLayout.NORTH, saveChances, 35, SpringLayout.NORTH, resetChances);
 		layout.putConstraint(SpringLayout.EAST, saveChances, -20, SpringLayout.EAST, editPanel);
 
 		layout.putConstraint(SpringLayout.SOUTH, clear, -10, SpringLayout.SOUTH, editPanel);
@@ -202,6 +225,9 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 		container.add(editPanel, BorderLayout.EAST);
 		container.add(filePanel, BorderLayout.WEST);
 		container.add(buttonPanel, BorderLayout.SOUTH);
+
+//----------------------------------------------rest---------------------------------------------------
+		saveChances.doClick(); // initialize chances
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -257,13 +283,14 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 					}
 					break;
 				case "save chances":
-					for (int i = 0; i < pathChoices.length; i++) {
-						for (int j = 0; j < pathChoices[0].length; j++) {
-							int chance = Integer.parseInt(pathChoices[i][j].getText());
-							chance = Math.max(0, chance);
-							chance = Math.min(chance, 100);
-							BoardDirection from = BoardDirection.values()[i];
-							BoardDirection to = BoardDirection.values()[j];
+					for (int row = 0; row < numOfDirections; row++) {
+						if (!isValidChanceRow(row))
+							resetChancesRow(row);
+
+						for (int col = 0; col < numOfDirections; col++) {
+							int chance = Integer.parseInt(pathChoices[row][col].getText());
+							BoardDirection from = BoardDirection.values()[row];
+							BoardDirection to = BoardDirection.values()[col];
 							board.editChances.setChanceFromTo(from, to, chance);
 						}
 					}
@@ -278,11 +305,70 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 						board.resizingActive = !board.resizingActive;
 					filePanel.setVisible(!filePanel.isVisible());
 					break;
+				case "reset chances":
+					resetChances();
+					break;
+				case "clear chances":
+					clearChances();
+					break;
 			}
 		}
 	}
 
 	public void stateChanged(ChangeEvent e) {
 		timer.setDelay(maxDelay - pred.getValue());
+	}
+
+	private static boolean isNumeric(String strNum) {
+		if (strNum == null) {
+			return false;
+		}
+		try {
+			Integer.parseInt(strNum);
+		} catch (NumberFormatException nfe) {
+			return false;
+		}
+		return true;
+	}
+
+	private static boolean isValidChance(int num){
+		return num >= 0 && num <= 100;
+	}
+
+	private boolean isValidChanceRow(int row){
+		int sumOfPercents = 0;
+		for(int col = 0; col < numOfDirections; col++){
+			String text = pathChoices[row][col].getText();
+			if (!isNumeric(text))
+				return false;
+			int chance = Integer.parseInt(text);
+			if (!isValidChance(chance))
+				return false;
+			sumOfPercents += chance;
+		}
+		return (sumOfPercents == 100);
+	}
+
+	private void resetChancesRow(int row){
+		for (int col = 0; col < numOfDirections; col++){
+			if (col == row)
+				pathChoices[row][col].setText("100");
+			else
+				pathChoices[row][col].setText("0");
+		}
+	}
+
+	private void resetChances(){
+		for(int row=0; row < numOfDirections; row++){
+			resetChancesRow(row);
+		}
+	}
+
+	private void clearChances(){
+		for(int row=0; row < numOfDirections; row++) {
+			for (int col = 0; col < numOfDirections; col++) {
+				pathChoices[row][col].setText("0");
+			}
+		}
 	}
 }

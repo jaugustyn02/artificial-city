@@ -9,7 +9,6 @@ import java.util.Random;
 
 public class Crossing extends Point implements Drivable, Walkable{
     private DrivingPathChances chances = new DrivingPathChances();
-//    private int[] directionChances = new int[BoardDirection.values().length];
     private Lights lightsController = null;
     public Crossing(){
         super(CellType.CROSSING);
@@ -38,7 +37,8 @@ public class Crossing extends Point implements Drivable, Walkable{
             percent -= chance;
             ++index;
         }
-        return null; // no available direction or error
+//        return null; // no available direction or error
+        return from;
     }
 
     @Override
