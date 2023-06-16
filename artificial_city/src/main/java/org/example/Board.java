@@ -114,17 +114,21 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		this.length = length;
 		this.height = height;
 
-		for (int x = 0; x < length; ++x)
-			for (int y = 0; y < height; ++y) {
-				if (x < points.length && y < points[0].length){
-					new_points[x][y] = points[x][y];
-				}
-				else{
+		for(int x = 0; x < length; ++x) {
+			for(int y = 0; y < height; ++y) {
+				if (x < this.points.length && y < this.points[0].length) {
+					new_points[x][y] = this.points[x][y];
+					new_movingObjects[x][y] = this.movingObjects[x][y];
+					new_iterablePoints[x][y] = this.iterablePoints[x][y];
+				} else {
 					new_points[x][y] = new Point();
 				}
 			}
+		}
 
-		points = new_points;
+		this.points = new_points;
+		this.movingObjects = new_movingObjects;
+		this.iterablePoints = new_iterablePoints;
 	}
 
 	protected void paintComponent(Graphics g) {
