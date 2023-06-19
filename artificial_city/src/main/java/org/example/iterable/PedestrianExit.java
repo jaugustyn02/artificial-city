@@ -8,6 +8,7 @@ import org.example.cells.WalkablePoint;
 
 public class PedestrianExit extends WalkablePoint implements Exit {
     private Board board;
+    public int EXIT_ID;
 
     public void setBoard(Board board){
         this.board = board;
@@ -21,5 +22,11 @@ public class PedestrianExit extends WalkablePoint implements Exit {
     @Override
     public void acquire() {
         board.removeMovingObjectsAt(getPosition().x(), getPosition().y());
+        resetNumOfPedestrians();
+    }
+
+    @Override
+    public String getInfo(){
+        return super.getInfo() + ", ID: " + EXIT_ID;
     }
 }

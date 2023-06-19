@@ -6,6 +6,7 @@ import org.example.iterable.DrivingPathChances;
 import org.example.iterable.IterablePoint;
 import org.example.iterable.PedestrianExit;
 import org.example.moving.BoardDirection;
+import org.example.moving.Car;
 import org.example.moving.Pedestrian;
 import org.example.moving.PedestrianGroup;
 
@@ -53,8 +54,7 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 
 	public void iteration() {
 		for(IterablePoint point : getIterablePoints1d()){
-			if (point instanceof Exit)
-				point.iterate();
+			point.iterate();
 		}
 
 		for(MovingObject obj : getMovingObjects1d()){
@@ -65,13 +65,15 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 			if (obj instanceof PedestrianGroup pedestrianGroup){
 				for (Pedestrian pedestrian: pedestrianGroup.getPedestrians()) {
 					pedestrian.move();
-					if (!(newMovingObjects[pedestrian.getX()][pedestrian.getY()] instanceof PedestrianGroup))
+					if (!(newMovingObjects[pedestrian.getX()][pedestrian.getY()] instanceof PedestrianGroup)) {
 						newMovingObjects[pedestrian.getX()][pedestrian.getY()] = new PedestrianGroup();
+						newMovingObjects[pedestrian.getX()][pedestrian.getY()].setPosition(pedestrian.getX(), pedestrian.getY());
+					}
 					PedestrianGroup newPedestrianGroup = (PedestrianGroup)newMovingObjects[pedestrian.getX()][pedestrian.getY()];
 					newPedestrianGroup.addPedestrian(pedestrian);
 				}
 			}
-			else {
+			else if (obj instanceof Car){
 				obj.move();
 				newMovingObjects[obj.getX()][obj.getY()] = obj;
 			}
@@ -85,6 +87,10 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 
 		for(LightsCrossingController controller: lightsCrossingControllers){
 			controller.iterate();
+		}
+
+		for(PedestrianExit exit: pedestrianExits){
+			exit.acquire();
 		}
 
 		this.repaint();
@@ -210,9 +216,15 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 			movingObjects[x][y] = obj;
 		} else if (editType == CellType.PEDESTRIAN) {
 			MovingObject obj = editType.getMovingObject();
-			obj.setPosition(x,y);
-			((Pedestrian)obj).setTargetExit(getRandomPedestrianExit());
-			movingObjects[x][y] = obj;
+			Pedestrian pedestrian = (Pedestrian)obj;
+			pedestrian.setPosition(x,y);
+			pedestrian.setTargetExit(getRandomPedestrianExit());
+			if (!(movingObjects[x][y] instanceof PedestrianGroup)) {
+				movingObjects[x][y] = new PedestrianGroup();
+				movingObjects[x][y].setPosition(x, y);
+			}
+			PedestrianGroup pedestrianGroup = (PedestrianGroup)movingObjects[x][y];
+			pedestrianGroup.addPedestrian(pedestrian);
 		} else {
 			points[x][y] = editType.getObject();
 
@@ -220,10 +232,10 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 				point.setPosition(x, y);
 				point.setBoard(this);
 				iterablePoints[x][y] = point;
-			}
 
-			if (points[x][y] instanceof PedestrianExit pedestrianExit){
-				pedestrianExit.setBoard(this);
+				if (point instanceof Entrance entrance){
+					entrance.setSpawnChance(0.1);
+				}
 			}
 
 			if (points[x][y] instanceof Drivable drivable){
@@ -251,7 +263,9 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 			}
 
 			if (points[x][y] instanceof PedestrianExit exit){
+				exit.EXIT_ID = pedestrianExits.size();
 				pedestrianExits.add(exit);
+				exit.setBoard(this);
 			}
 
 			System.out.println("[POINT PLACED] - {position: ("+x+", "+y+"), "+getCellAt(x, y).getInfo()+"}");
@@ -333,20 +347,12 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		}
 	}
 
-	private void calcExitStaticField(PedestrianExit exit){
-		ArrayList<WalkablePoint> toCheckField = new ArrayList<>();
-		for (int x = 0; x < points.length; ++x) {
-			for (int y = 0; y < points[x].length; ++y) {
-				if (points[x][y] instanceof PedestrianExit exit2){
-					exit2.setStaticField(exit, 0);
-					toCheckField.addAll(exit2.getWalkableNeighbours());
-				}
-			}
-		}
-
+	private void calcExitStaticField(PedestrianExit currentExit){
+		currentExit.setStaticField(currentExit, 0);
+		ArrayList<WalkablePoint> toCheckField = new ArrayList<>(currentExit.getWalkableNeighbours());
 		while(!toCheckField.isEmpty()){
 			WalkablePoint currPoint = toCheckField.get(0);
-			if (currPoint.calcStaticField(exit)){
+			if (currPoint.calcStaticField(currentExit)){
 				toCheckField.addAll(currPoint.getWalkableNeighbours());
 			}
 			toCheckField.remove(currPoint);

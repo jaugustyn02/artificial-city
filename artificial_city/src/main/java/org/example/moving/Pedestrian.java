@@ -30,15 +30,15 @@ public class Pedestrian extends MovingObject {
 					a -> !a.isOccupied()
 			).min(Comparator.comparingDouble(p -> p.getStaticField(targetExit)));
 
-			if (optionalMinSFNNeighbor.isEmpty()) {
+			if (optionalMinSFNNeighbor.isEmpty() ||
+                    currentPoint.getStaticField(targetExit) <= optionalMinSFNNeighbor.get().getStaticField(targetExit)){
                 nextPosition = currentPoint.getPosition();
 				return;
 			}
 
 			WalkablePoint minSFNNeighbor = optionalMinSFNNeighbor.get();
-			System.out.println("Minimal static field: "+minSFNNeighbor.getStaticField(targetExit));
-			currentPoint.numOfPedestrians--;
-			minSFNNeighbor.numOfPedestrians++;
+			currentPoint.decrementNumOfPedestrians();
+			minSFNNeighbor.incrementNumOfPedestrians();
 			nextPosition = minSFNNeighbor.getPosition();
 		}
     }
@@ -47,5 +47,10 @@ public class Pedestrian extends MovingObject {
     public void move() {
         this.x = nextPosition.x();
         this.y = nextPosition.y();
+    }
+
+    @Override
+    public String getInfo(){
+        return super.getInfo() + ", ExitID: " + targetExit.EXIT_ID;
     }
 }

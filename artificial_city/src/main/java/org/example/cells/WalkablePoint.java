@@ -11,7 +11,7 @@ public abstract class WalkablePoint extends Point {
     protected final Map<WalkablePoint, Boolean> neighbourIsOnDiagonal = new HashMap<>();
     protected final Map<PedestrianExit, Double> exitStaticFields = new HashMap<>();
     private static final double STATIC_FIELD_MAX = 100000;
-    public int numOfPedestrians = 0;
+    private int numOfPedestrians = 0;
     int maxNumOfPedestrians = 20;
     private Vector2D position;
 
@@ -76,8 +76,20 @@ public abstract class WalkablePoint extends Point {
         return position;
     }
 
+    public void incrementNumOfPedestrians(){
+        numOfPedestrians++;
+    }
+
+    public void decrementNumOfPedestrians(){
+        numOfPedestrians--;
+    }
+
+    public void resetNumOfPedestrians(){
+        numOfPedestrians = 0;
+    }
+
     @Override
     public String getInfo(){
-        return super.getInfo() + ", StaticFields: " + exitStaticFields.values();
+        return super.getInfo() + ", StaticFields: " + exitStaticFields.values() + ", NumOfPedestrians: " +numOfPedestrians;
     }
 }

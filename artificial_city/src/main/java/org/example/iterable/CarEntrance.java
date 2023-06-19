@@ -13,7 +13,7 @@ public class CarEntrance extends IterablePoint implements Entrance {
     private final static BoardDirection[] directions = {
             BoardDirection.TOP, BoardDirection.RIGHT, BoardDirection.BOTTOM, BoardDirection.LEFT
     };
-    private double carAppearanceChance = 0.1;
+    private double carSpawnChance = 0.0;
     private List<BoardDirection> neighbourRoadsDirections;
 
     public CarEntrance(){
@@ -22,22 +22,32 @@ public class CarEntrance extends IterablePoint implements Entrance {
 
     @Override
     public void iterate() {
-        release();
+        if (neighbourRoadsDirections == null)
+            addNeighbourRoads();
+        double chanceLeft = carSpawnChance;
+        while (chanceLeft > 0){
+            double rand = Math.random();
+            if (rand < chanceLeft){
+                release();
+            }
+            chanceLeft -= rand;
+        }
+    }
+
+    @Override
+    public void setSpawnChance(double spawnChance) {
+        carSpawnChance = spawnChance;
     }
 
     @Override
     public void release(){
-        if (neighbourRoadsDirections == null)
-            addNeighbourRoads();
-        if (Math.random() < carAppearanceChance){
-            for (BoardDirection direction : neighbourRoadsDirections){
-                board.editDirection = direction;
-                board.editType = CellType.CAR;
-                Vector2D vector = new Vector2D(x ,y);
-                vector = vector.add(direction.getVector());
-                board.setCell(vector.x(), vector.y());
-                board.getMovingObjectAt(vector.x(), vector.y()).setVelocity(Config.maxVelocity);
-            }
+        for (BoardDirection direction : neighbourRoadsDirections){
+            board.editDirection = direction;
+            board.editType = CellType.CAR;
+            Vector2D vector = new Vector2D(x ,y);
+            vector = vector.add(direction.getVector());
+            board.setCell(vector.x(), vector.y());
+            board.getMovingObjectAt(vector.x(), vector.y()).setVelocity(Config.maxVelocity);
         }
     }
 
