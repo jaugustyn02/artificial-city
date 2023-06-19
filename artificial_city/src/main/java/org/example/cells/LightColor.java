@@ -15,4 +15,15 @@ public enum LightColor {
             default -> null;
         };
     }
+
+    @Override
+    public String toString() {
+        return "LightColor{" +
+            switch (this) {
+                case RED -> "RED";
+                case GREEN -> "GREEN";
+                case YELLOW -> "YELLOW";
+            }
+                    +"}";
+    }
 }

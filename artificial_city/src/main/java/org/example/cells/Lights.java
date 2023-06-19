@@ -3,11 +3,9 @@ package org.example.cells;
 import org.example.Point;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Lights extends Point implements Walkable{
-    List<Point> pointsControlled = new ArrayList<>();
+    Point pointControlled;
     public int x;
     public int y;
     private LightColor currentState;
@@ -21,8 +19,8 @@ public class Lights extends Point implements Walkable{
         return currentState.getColor();
     }
 
-    public void addPoint(Point point) {
-        pointsControlled.add(point);
+    public void setPoint(Point point) {
+        pointControlled = point;
     }
 
     public LightColor  getLightColor() {

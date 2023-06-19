@@ -212,7 +212,7 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 				drivable.setDrivingPathChances(editChances);
 			}
 
-			System.out.println("[POINT PLACED] - {position: ("+x+", "+y+"), "+getCellAt(x, y).getInfo()+"}");
+//			System.out.println("[POINT PLACED] - {position: ("+x+", "+y+"), "+getCellAt(x, y).getInfo()+"}");
 		}
 
 		this.repaint();

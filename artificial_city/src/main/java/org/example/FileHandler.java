@@ -3,10 +3,9 @@ package org.example;
 import org.example.cells.*;
 import org.example.iterable.DrivingPathChances;
 
+
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class FileHandler {
@@ -70,6 +69,10 @@ public class FileHandler {
             String line;
             int i = 0;
             while ((line = br.readLine()) != null) {
+                if(line.equals("LIGHTS:")){
+                    readLightsConfig(br);
+                    break;
+                }
                 String[] points = line.split(";");
                 for (int j = 0; j < height; j++) {
                     if (i < length) {
@@ -98,84 +101,48 @@ public class FileHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Lights l1 = new Lights(65,19);
-        board.lights.add(l1);
 
-        l1.addPoint(board.getPointAt(65,20));
-        if(board.getPointAt(65,20) instanceof Drivable p){
-            p.setLightsController(l1);
-        }
 
-        l1.addPoint(board.getPointAt(65,21));
-        if(board.getPointAt(65,21) instanceof Drivable p){
-            p.setLightsController(l1);
-        }
-
-        l1.addPoint(board.getPointAt(65,22));
-        if(board.getPointAt(65,22) instanceof Drivable p){
-            p.setLightsController(l1);
-        }
-
-        Lights l2 = new Lights(58,30);
-        board.lights.add(l2);
-
-        l2.addPoint(board.getPointAt(58,29));
-        if(board.getPointAt(58,29) instanceof Drivable p){
-            p.setLightsController(l2);
-        }
-
-        l2.addPoint(board.getPointAt(58,28));
-        if(board.getPointAt(58,28) instanceof Drivable p){
-            p.setLightsController(l2);
-        }
-
-        l2.addPoint(board.getPointAt(58,27));
-        if(board.getPointAt(58,27) instanceof Drivable p){
-            p.setLightsController(l2);
-        }
-
-        Lights l3 = new Lights(59,16);
-        board.lights.add(l3);
-
-        l3.addPoint(board.getPointAt(60,16));
-        if(board.getPointAt(60,16) instanceof Drivable p){
-            p.setLightsController(l3);
-        }
-
-        l3.addPoint(board.getPointAt(61,16));
-        if(board.getPointAt(61,16) instanceof Drivable p){
-            p.setLightsController(l3);
-        }
-
-        Lights l4 = new Lights(64,33);
-        board.lights.add(l4);
-
-        l4.addPoint(board.getPointAt(63,33));
-        if(board.getPointAt(63,33) instanceof Drivable p){
-            p.setLightsController(l4);
-        }
-
-        l4.addPoint(board.getPointAt(62,33));
-        if(board.getPointAt(62,33) instanceof Drivable p){
-            p.setLightsController(l4);
-        }
-
-        LightsCrossingController controller = new LightsCrossingController();
-        List<Lights> lights = new ArrayList<>();
-        lights.add(l1);
-        lights.add(l2);
-        lights.add(l3);
-        lights.add(l4);
-
-        List<State> states = new ArrayList<>();
-        states.add(new State(new LightColor[]{LightColor.GREEN, LightColor.GREEN,LightColor.RED, LightColor.RED}, 50));
-        states.add(new State(new LightColor[]{LightColor.RED, LightColor.RED,LightColor.RED, LightColor.RED}, 5));
-        states.add(new State(new LightColor[]{LightColor.RED,LightColor.RED,LightColor.GREEN, LightColor.GREEN}, 50));
-        states.add(new State(new LightColor[]{LightColor.RED,LightColor.RED,LightColor.RED, LightColor.RED}, 5));
-
-        controller.initialize(lights, states);
-        board.lightsCrossingControllers.add(controller);
 
         board.editType = CellType.SELECT;
     }
+    private void readLightsConfig(BufferedReader br) throws IOException{
+        LightsInitializer initializer = new LightsInitializer(board);
+        String line = br.readLine();
+        String[] lightsS = line.split(";");
+        for(String lightS : lightsS){
+            String[] cordinatesS = lightS.split(",");
+            String regex = "\\D";
+            String xS = cordinatesS[0].replaceAll(regex, "");
+            String yS = cordinatesS[1].replaceAll(regex, "");
+            int x = Integer.parseInt(xS);
+            int y = Integer.parseInt(yS);
+            initializer.addLights(x,y);
+        }
+        while ((line = br.readLine()) != null){
+            if(line.equals("LIGHTS:")){
+                initializer.commit();
+                readLightsConfig(br);
+                return;
+            }
+            String[] statesS = line.split(",");
+            String[] lightsColorsS = statesS[0].split(" ");
+            int time = Integer.parseInt(statesS[1].strip());
+            LightColor[] lightColors = Arrays.stream(lightsColorsS).sequential()
+                    .map(c->c.replaceAll("(\\[|\\])", ""))
+                    .map(c-> switch (c.strip()){
+                        case "R" -> LightColor.RED;
+                        case "Y" -> LightColor.YELLOW;
+                        case "G" -> LightColor.GREEN;
+                        default -> null;
+                    }).toArray(LightColor[]::new);
+
+            State state = new State(lightColors, time);
+            initializer.addState(state);
+        }
+
+
+        initializer.commit();
+    }
+
 }
