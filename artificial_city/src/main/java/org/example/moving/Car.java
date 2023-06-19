@@ -14,6 +14,7 @@ public class Car extends MovingObject{
     public final static double slowDownChance = 0.2;
 
     private Vector2D nextPosition;
+    private BoardDirection nextDirection;
 
     public Car() {
         this(BoardDirection.RIGHT);
@@ -48,7 +49,6 @@ public class Car extends MovingObject{
     }
 
     public void slowDown(Point[][] points,MovingObject[][] movingObjects ) {
-
         BoardDirection driveDirection = this.direction;
         int distanceDriven = 0;
         Vector2D pos = new Vector2D(x,y);
@@ -99,9 +99,11 @@ public class Car extends MovingObject{
         nextPosition = new Vector2D(x,y).add(toAdd);
         velocity = maxVelocity;
 
+        nextDirection = this.direction;
         if(changedDirection){
             velocity = 0;
-            this.direction = driveDirection;
+//            this.direction = driveDirection;
+            nextDirection = driveDirection;
         }
 
     }
@@ -116,5 +118,6 @@ public class Car extends MovingObject{
     public void move(){
         x = nextPosition.x();
         y = nextPosition.y();
+        direction = nextDirection;
     }
 }

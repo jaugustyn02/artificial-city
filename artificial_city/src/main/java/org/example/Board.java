@@ -1,9 +1,14 @@
 package org.example;
 
 import org.example.cells.*;
+import org.example.helpers.Vector2D;
 import org.example.iterable.DrivingPathChances;
 import org.example.iterable.IterablePoint;
+import org.example.iterable.PedestrianExit;
 import org.example.moving.BoardDirection;
+import org.example.moving.Car;
+import org.example.moving.Pedestrian;
+import org.example.moving.PedestrianGroup;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -12,10 +17,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.io.Serial;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Stream;
 
 import javax.swing.JComponent;
@@ -27,6 +29,7 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	private Point[][] points;
 	private MovingObject[][] movingObjects;
 	private IterablePoint[][] iterablePoints;
+	private final List<PedestrianExit> pedestrianExits = new ArrayList<>();
 	public List<Lights> lights = new ArrayList<>();
 	public List<LightsCrossingController> lightsCrossingControllers = new ArrayList<>();
 	final public int size = 10;
@@ -53,8 +56,7 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 
 	public void iteration() {
 		for(IterablePoint point : getIterablePoints1d()){
-			if (point instanceof Exit)
-				point.iterate();
+			point.iterate();
 		}
 
 		for(MovingObject obj : getMovingObjects1d()){
@@ -62,8 +64,21 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		}
 		MovingObject[][] newMovingObjects = new MovingObject[length][height];
 		for(MovingObject obj : getMovingObjects1d()){
-			obj.move();
-			newMovingObjects[obj.getX()][obj.getY()] = obj;
+			if (obj instanceof PedestrianGroup pedestrianGroup){
+				for (Pedestrian pedestrian: pedestrianGroup.getPedestrians()) {
+					pedestrian.move();
+					if (!(newMovingObjects[pedestrian.getX()][pedestrian.getY()] instanceof PedestrianGroup)) {
+						newMovingObjects[pedestrian.getX()][pedestrian.getY()] = new PedestrianGroup();
+						newMovingObjects[pedestrian.getX()][pedestrian.getY()].setPosition(pedestrian.getX(), pedestrian.getY());
+					}
+					PedestrianGroup newPedestrianGroup = (PedestrianGroup)newMovingObjects[pedestrian.getX()][pedestrian.getY()];
+					newPedestrianGroup.addPedestrian(pedestrian);
+				}
+			}
+			else if (obj instanceof Car){
+				obj.move();
+				newMovingObjects[obj.getX()][obj.getY()] = obj;
+			}
 		}
 		movingObjects = newMovingObjects;
 
@@ -74,6 +89,10 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 
 		for(LightsCrossingController controller: lightsCrossingControllers){
 			controller.iterate();
+		}
+
+		for(PedestrianExit exit: pedestrianExits){
+			exit.acquire();
 		}
 
 		this.repaint();
@@ -200,8 +219,15 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 			movingObjects[x][y] = obj;
 		} else if (editType == CellType.PEDESTRIAN) {
 			MovingObject obj = editType.getMovingObject();
-			obj.setPosition(x,y);
-			movingObjects[x][y] = obj;
+			Pedestrian pedestrian = (Pedestrian)obj;
+			pedestrian.setPosition(x,y);
+			pedestrian.setTargetExit(getRandomPedestrianExit());
+			if (!(movingObjects[x][y] instanceof PedestrianGroup)) {
+				movingObjects[x][y] = new PedestrianGroup();
+				movingObjects[x][y].setPosition(x, y);
+			}
+			PedestrianGroup pedestrianGroup = (PedestrianGroup)movingObjects[x][y];
+			pedestrianGroup.addPedestrian(pedestrian);
 		} else {
 			points[x][y] = editType.getObject();
 
@@ -209,6 +235,10 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 				point.setPosition(x, y);
 				point.setBoard(this);
 				iterablePoints[x][y] = point;
+
+				if (point instanceof Entrance entrance){
+					entrance.setSpawnChance(0.1);
+				}
 			}
 
 			if (points[x][y] instanceof Drivable drivable){
@@ -216,7 +246,33 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 				drivable.setSpeedLimit(editSpeedLimit);
 			}
 
-//			System.out.println("[POINT PLACED] - {position: ("+x+", "+y+"), "+getCellAt(x, y).getInfo()+"}");
+			if (points[x][y] instanceof WalkablePoint walkable){
+				walkable.setPosition(new Vector2D(x, y));
+				for (int i=-1; i < 2; i++){
+					for (int j=-1; j < 2; j++){
+						int curr_x = x+i;
+						int curr_y = y+j;
+						if (curr_x < 0 || curr_y < 0 || curr_x >= getPointsLength() || curr_y >= getPointsHeight())
+							continue;
+						if ((i != 0 || j != 0) && points[curr_x][curr_y] instanceof WalkablePoint neighbour) {
+							walkable.addWalkableNeighbour(neighbour);
+							neighbour.addWalkableNeighbour(walkable);
+							if (i * j != 0){
+								neighbour.setNeighbourIsOnDiagonal(walkable);
+								walkable.setNeighbourIsOnDiagonal(neighbour);
+							}
+						}
+					}
+				}
+			}
+
+			if (points[x][y] instanceof PedestrianExit exit){
+				exit.EXIT_ID = pedestrianExits.size();
+				pedestrianExits.add(exit);
+				exit.setBoard(this);
+			}
+
+			System.out.println("[POINT PLACED] - {position: ("+x+", "+y+"), "+getCellAt(x, y).getInfo()+"}");
 		}
 
 		this.repaint();
@@ -282,10 +338,35 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	public int getPointsLength(){
 		return points.length;
 	}
+
 	public int getPointsHeight(){
 		if (points.length > 0)
 			return points[0].length;
 		return 0;
+	}
+
+	public void calcStaticField(){
+		for(PedestrianExit exit: pedestrianExits){
+			calcExitStaticField(exit);
+		}
+	}
+
+	private void calcExitStaticField(PedestrianExit currentExit){
+		currentExit.setStaticField(currentExit, 0);
+		ArrayList<WalkablePoint> toCheckField = new ArrayList<>(currentExit.getWalkableNeighbours());
+		while(!toCheckField.isEmpty()){
+			WalkablePoint currPoint = toCheckField.get(0);
+			if (currPoint.calcStaticField(currentExit)){
+				toCheckField.addAll(currPoint.getWalkableNeighbours());
+			}
+			toCheckField.remove(currPoint);
+		}
+	}
+
+	public PedestrianExit getRandomPedestrianExit(){
+		Random rand = new Random();
+		int randomIndex = rand.nextInt(pedestrianExits.size());
+		return pedestrianExits.get(randomIndex);
 	}
 
 // ------------------------------------------------------------------------------

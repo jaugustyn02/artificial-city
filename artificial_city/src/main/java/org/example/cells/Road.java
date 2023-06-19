@@ -47,7 +47,6 @@ public class Road extends Point implements Drivable {
         for (BoardDirection to: BoardDirection.values()) {
             int chance = getDrivingPathChances().getChancesFromTo(from, to);
             if (percent < chance) {
-                System.out.println("Returned: "+to);
                 return to;
             }
             percent -= chance;

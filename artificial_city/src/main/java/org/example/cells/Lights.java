@@ -4,7 +4,7 @@ import org.example.Point;
 
 import java.awt.*;
 
-public class Lights extends Point implements Walkable{
+public class Lights extends WalkablePoint{
     Point pointControlled;
     public int x;
     public int y;

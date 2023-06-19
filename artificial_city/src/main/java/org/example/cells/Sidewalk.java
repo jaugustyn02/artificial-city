@@ -1,8 +1,6 @@
 package org.example.cells;
 
-import org.example.Point;
-
-public class Sidewalk extends Point implements Walkable{
+public class Sidewalk extends WalkablePoint{
     public Sidewalk(){
         super(CellType.SIDEWALK);
     }

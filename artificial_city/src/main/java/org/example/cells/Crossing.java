@@ -5,10 +5,9 @@ import org.example.Point;
 import org.example.iterable.DrivingPathChances;
 import org.example.moving.BoardDirection;
 
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
-public class Crossing extends Point implements Drivable, Walkable{
+public class Crossing extends WalkablePoint implements Drivable{
     private DrivingPathChances chances = new DrivingPathChances();
     private Lights lightsController = null;
     private int speedLimit = Config.maxVelocity;

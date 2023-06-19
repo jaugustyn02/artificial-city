@@ -274,12 +274,12 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 				case "Start":
 					if (!running) {
 						timer.start();
+						board.calcStaticField();
 						start.setText("Pause");
 					} else {
 						timer.stop();
 						start.setText("Start");
 						CellType newType = (CellType) drawType.getSelectedItem();
-						System.out.println("Edit type: "+newType);
 						board.editType = newType;
 					}
 					running = !running;
