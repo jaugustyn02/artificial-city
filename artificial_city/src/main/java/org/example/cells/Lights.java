@@ -6,7 +6,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Lights extends Point implements Walkable{
+public class Lights extends WalkablePoint{
     List<Point> pointsControlled = new ArrayList<>();
     public int x;
     public int y;

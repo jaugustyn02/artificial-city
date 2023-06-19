@@ -3,6 +3,7 @@ package org.example;
 import org.example.cells.*;
 import org.example.iterable.DrivingPathChances;
 import org.example.iterable.IterablePoint;
+import org.example.iterable.PedestrianExit;
 import org.example.moving.BoardDirection;
 
 import java.awt.Color;
@@ -27,6 +28,7 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	private Point[][] points;
 	private MovingObject[][] movingObjects;
 	private IterablePoint[][] iterablePoints;
+	private final List<PedestrianExit> pedestrianExits = new ArrayList<>();
 	public List<Lights> lights = new ArrayList<>();
 	public List<LightsCrossingController> lightsCrossingControllers = new ArrayList<>();
 	final public int size = 10;
@@ -212,6 +214,29 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 				drivable.setDrivingPathChances(editChances);
 			}
 
+			if (points[x][y] instanceof WalkablePoint walkable){
+				for (int i=-1; i < 2; i++){
+					for (int j=-1; j < 2; j++){
+						int curr_x = x+i;
+						int curr_y = y+j;
+						if (curr_x < 0 || curr_y < 0 || curr_x >= getPointsLength() || curr_y >= getPointsHeight())
+							continue;
+						if ((i != 0 || j != 0) && points[curr_x][curr_y] instanceof WalkablePoint neighbour) {
+							walkable.addWalkableNeighbour(neighbour);
+							neighbour.addWalkableNeighbour(walkable);
+							if (i * j != 0){
+								neighbour.setNeighbourIsOnDiagonal(walkable);
+								walkable.setNeighbourIsOnDiagonal(neighbour);
+							}
+						}
+					}
+				}
+			}
+
+			if (points[x][y] instanceof PedestrianExit exit){
+				pedestrianExits.add(exit);
+			}
+
 			System.out.println("[POINT PLACED] - {position: ("+x+", "+y+"), "+getCellAt(x, y).getInfo()+"}");
 		}
 
@@ -278,10 +303,37 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	public int getPointsLength(){
 		return points.length;
 	}
+
 	public int getPointsHeight(){
 		if (points.length > 0)
 			return points[0].length;
 		return 0;
+	}
+
+	public void calcStaticField(){
+		for(PedestrianExit exit: pedestrianExits){
+			calcExitStaticField(exit);
+		}
+	}
+
+	private void calcExitStaticField(PedestrianExit exit){
+		ArrayList<WalkablePoint> toCheckField = new ArrayList<>();
+		for (int x = 0; x < points.length; ++x) {
+			for (int y = 0; y < points[x].length; ++y) {
+				if (points[x][y] instanceof PedestrianExit exit2){
+					exit2.setStaticField(exit, 0);
+					toCheckField.addAll(exit2.getWalkableNeighbours());
+				}
+			}
+		}
+
+		while(!toCheckField.isEmpty()){
+			WalkablePoint currPoint = toCheckField.get(0);
+			if (currPoint.calcStaticField(exit)){
+				toCheckField.addAll(currPoint.getWalkableNeighbours());
+			}
+			toCheckField.remove(currPoint);
+		}
 	}
 
 // ------------------------------------------------------------------------------
