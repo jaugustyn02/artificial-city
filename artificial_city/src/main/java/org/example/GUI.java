@@ -29,7 +29,7 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 	private final int maxDelay = 500;
 	private boolean running = false;
 	private static final int numOfDirections = BoardDirection.values().length;
-
+	private JTextField speedLimitTextField;
 	public GUI(JFrame jf) {
 		frame = jf;
 		int initDelay = 100;
@@ -121,6 +121,13 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 		JLabel from = new JLabel("From\\To");
 		JLabel[] fromDirections = {new JLabel("\uD83E\uDC81"), new JLabel("\uD83E\uDC7A"), new JLabel("\uD83E\uDC7B"), new JLabel("\uD83E\uDC78")};
 		JLabel[] toDirections = {new JLabel("\uD83E\uDC81"), new JLabel("\uD83E\uDC7A"), new JLabel("\uD83E\uDC7B"), new JLabel("\uD83E\uDC78")};
+		JLabel speedLimitLabel = new JLabel("Speed limit: ");
+		speedLimitTextField = new JTextField("5");
+		speedLimitTextField.setPreferredSize(new Dimension(40, 20));
+		JButton speedLimitSaveButton = new JButton("S");
+		speedLimitSaveButton.setActionCommand("save speed limit");
+		speedLimitSaveButton.setPreferredSize(new Dimension(40,20));
+		speedLimitSaveButton.addActionListener(this);
 
 		editPanel = new JPanel();
 		editPanel.setLayout(layout);
@@ -128,6 +135,8 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 		editPanel.setVisible(false);
 		editPanel.add(type);
 		editPanel.add(drawType);
+		editPanel.add(speedLimitLabel);
+		editPanel.add(speedLimitTextField);
 		editPanel.add(road);
 		editPanel.add(from);
 		for (JLabel label: fromDirections) editPanel.add(label);
@@ -142,6 +151,7 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 		editPanel.add(saveChances);
 		editPanel.add(clear);
 		editPanel.add(clearObjects);
+		editPanel.add(speedLimitSaveButton);
 
 		layout.putConstraint(SpringLayout.NORTH, type, 10, SpringLayout.NORTH, editPanel);
 		layout.putConstraint(SpringLayout.WEST, type, 10, SpringLayout.WEST, editPanel);
@@ -172,6 +182,15 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 				layout.putConstraint(SpringLayout.WEST, pathChoices[i][j], 30*j + 63, SpringLayout.WEST, editPanel);
 			}
 		}
+
+		layout.putConstraint(SpringLayout.NORTH, speedLimitLabel, 30, SpringLayout.NORTH, drawType);
+		layout.putConstraint(SpringLayout.WEST, speedLimitLabel, 10, SpringLayout.WEST, editPanel);
+
+		layout.putConstraint(SpringLayout.NORTH, speedLimitTextField, 30, SpringLayout.NORTH, drawType);
+		layout.putConstraint(SpringLayout.WEST, speedLimitTextField, 90, SpringLayout.WEST, speedLimitLabel);
+
+		layout.putConstraint(SpringLayout.NORTH, speedLimitSaveButton, 30, SpringLayout.NORTH, drawType);
+		layout.putConstraint(SpringLayout.WEST, speedLimitSaveButton, 50, SpringLayout.WEST, speedLimitTextField);
 
 		layout.putConstraint(SpringLayout.NORTH, resetChances, 30, SpringLayout.NORTH, pathChoices[3][3]);
 		layout.putConstraint(SpringLayout.WEST, resetChances, 46, SpringLayout.WEST, editPanel);
@@ -327,6 +346,15 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 					break;
 				case "clear objects":
 					board.clearMovingObjects();
+					break;
+				case "save speed limit":
+					String limitS = speedLimitTextField.getText();
+					if(isNumeric(limitS)){
+						int limit = Integer.parseInt(limitS);
+						board.setSpeedLimit(limit);
+					} else {
+						speedLimitTextField.setText("");
+					}
 					break;
 			}
 		}

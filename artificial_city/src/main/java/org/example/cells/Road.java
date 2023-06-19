@@ -1,5 +1,6 @@
 package org.example.cells;
 
+import org.example.Config;
 import org.example.Point;
 import org.example.iterable.DrivingPathChances;
 import org.example.moving.BoardDirection;
@@ -9,6 +10,16 @@ import java.util.*;
 public class Road extends Point implements Drivable {
     private DrivingPathChances chances = new DrivingPathChances();
 //    private List<BoardDirection> availableOvertakingDirections = new ArrayList<>();
+    private int speedLimit = Config.maxVelocity;
+
+    @Override
+    public void setSpeedLimit(int limit) {
+        speedLimit = limit;
+    }
+
+    public int getSpeedLimit() {
+        return speedLimit;
+    }
 
     private Lights lightsController = null;
     public Road(){

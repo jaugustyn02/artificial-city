@@ -1,5 +1,6 @@
 package org.example.cells;
 
+import org.example.Config;
 import org.example.Point;
 import org.example.iterable.DrivingPathChances;
 import org.example.moving.BoardDirection;
@@ -10,8 +11,19 @@ import java.util.Random;
 public class Crossing extends Point implements Drivable, Walkable{
     private DrivingPathChances chances = new DrivingPathChances();
     private Lights lightsController = null;
+    private int speedLimit = Config.maxVelocity;
     public Crossing(){
         super(CellType.CROSSING);
+    }
+
+    @Override
+    public void setSpeedLimit(int limit) {
+        speedLimit = limit;
+    }
+
+    @Override
+    public int getSpeedLimit() {
+        return speedLimit;
     }
 
     @Override

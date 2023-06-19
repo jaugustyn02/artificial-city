@@ -40,7 +40,9 @@ public class FileHandler {
                 for (Point point: points_row) {
                     if (point instanceof Drivable drivable){
                         fw.write(
-                                point.type.ordinal()+":" + drivable.getDrivingPathChances().toString() + ";"
+                                point.type.ordinal()+":"
+                                    + drivable.getDrivingPathChances().toString() + ":"
+                                    + drivable.getSpeedLimit() + ";"
                         );
                     }
                     else {
@@ -81,6 +83,11 @@ public class FileHandler {
                             board.editType = CellType.values()[Integer.parseInt(values[0])];
                             if (board.editType.getObject() instanceof Drivable){
                                 board.editChances = new DrivingPathChances(values[1]);
+                                if(values.length == 3){ //TODO REMOVE IF
+                                    board.editSpeedLimit = Integer.parseInt(values[2]);
+                                } else {
+                                    board.editSpeedLimit = Config.maxVelocity;
+                                }
                             }
                             board.setCell(i, j);
                         }

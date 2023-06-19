@@ -14,4 +14,6 @@ public interface Drivable {
 
     DrivingPathChances getDrivingPathChances();
     void setDrivingPathChances(DrivingPathChances chances);
+    int getSpeedLimit();
+    void setSpeedLimit(int limit);
 }

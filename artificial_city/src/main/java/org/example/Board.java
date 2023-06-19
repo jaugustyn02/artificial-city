@@ -34,9 +34,11 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	public FileHandler fileHandler = new FileHandler(this);
 	public BoardDirection editDirection = BoardDirection.RIGHT;
 	public DrivingPathChances editChances = new DrivingPathChances();
+	public int editSpeedLimit;
 	private int length;
 	private int height;
 	public boolean resizingActive = true;
+	private Point selectedPoint = null;
 
 	public Board(int length, int height) {
 		initialize(length, height);
@@ -184,6 +186,7 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		int y = e.getY() / size;
 		if (editType == CellType.SELECT){
 			System.out.println("[POINT SELECTED] - {position: ("+x+", "+y+"), "+getCellAt(x, y).getInfo()+"}");
+			selectedPoint = getCellAt(x, y);
 		}
 		else {
 			setCell(x, y);
@@ -210,6 +213,7 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 
 			if (points[x][y] instanceof Drivable drivable){
 				drivable.setDrivingPathChances(editChances);
+				drivable.setSpeedLimit(editSpeedLimit);
 			}
 
 //			System.out.println("[POINT PLACED] - {position: ("+x+", "+y+"), "+getCellAt(x, y).getInfo()+"}");
@@ -293,4 +297,17 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	public void mouseMoved(MouseEvent e) {}
 	public void componentHidden(ComponentEvent e) {}
 	public void mousePressed(MouseEvent e) {}
+
+    public void setSpeedLimit(int limit) {
+		if(selectedPoint != null && selectedPoint instanceof Drivable d){
+			System.out.println("SET SPEED");
+			d.setSpeedLimit(limit);
+		}
+    }
+
+	public void editSpeedLimit(int x, int y, int limit) {
+		if(points[x][y] instanceof Drivable d){
+			d.setSpeedLimit(limit);
+		}
+	}
 }

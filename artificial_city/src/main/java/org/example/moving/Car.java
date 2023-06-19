@@ -27,40 +27,63 @@ public class Car extends MovingObject{
     @Override
     public void iterate(Point[][] points, MovingObject[][] movingObjects) {
         // Nagel model
-        accelerate();
+        accelerate(points);
         slowDown(points,movingObjects);
         randomSlowDown();
     }
 
-    public void accelerate() {
-        if (velocity < Config.maxVelocity){
-            velocity++;
+    public void accelerate(Point[][] points) {
+        if(points[x][y] instanceof Drivable d){
+            int speedLimit = d.getSpeedLimit();
+            if (velocity < speedLimit){
+                velocity++;
+            } else if(velocity > speedLimit){
+                velocity = speedLimit;
+            }
+        } else {
+            if (velocity < Config.maxVelocity){
+                velocity++;
+            }
         }
     }
 
     public void slowDown(Point[][] points,MovingObject[][] movingObjects ) {
 
         BoardDirection driveDirection = this.direction;
-        int distanceToNextCar = 0;
+        int distanceDriven = 0;
         Vector2D pos = new Vector2D(x,y);
         int maxVelocity = velocity;
+        int maxDistance = Config.maxVelocity;
 
         boolean changedDirection = false;
 
-        while (distanceToNextCar < velocity){
+        // na koniec
+
+
+        while (distanceDriven < velocity){
             pos = pos.add(direction.getVector());
             MovingObject obj = movingObjects[pos.x()][pos.y()];
             Point point = points[pos.x()][pos.y()];
+            maxDistance--;
 
-            if(obj != null || !(point instanceof Drivable d) || !d.canDriveThrough()){
+
+
+            if(obj != null || !(point instanceof Drivable d) || !d.canDriveThrough() || maxDistance == 0){
                 if(point instanceof CarExit exit){
                     exit.removeCar(new Vector2D(x,y));
                 }
-                maxVelocity = distanceToNextCar;
+                maxVelocity = distanceDriven;
 
                 break;
             }
-            distanceToNextCar++;
+            int speedLimit = d.getSpeedLimit();
+            if(velocity > speedLimit){
+                if(maxDistance > speedLimit){
+                    maxDistance = speedLimit;
+                }
+            }
+
+            distanceDriven++;
 
             driveDirection = d.getDriveDirection(this.direction);
             if (driveDirection == null){
@@ -68,7 +91,7 @@ public class Car extends MovingObject{
             }
             if (driveDirection != this.direction){
                 changedDirection = true;
-                maxVelocity = distanceToNextCar;
+                maxVelocity = distanceDriven;
                 break;
             }
         }
