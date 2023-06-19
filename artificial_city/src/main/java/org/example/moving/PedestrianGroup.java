@@ -9,7 +9,6 @@ import java.util.List;
 
 public class PedestrianGroup extends MovingObject {
     List<Pedestrian> pedestrians = new ArrayList<>();
-    private static final int maxNumOfPedestrians = 20;
 
     public PedestrianGroup(){
         super(CellType.PEDESTRIAN);
@@ -17,6 +16,10 @@ public class PedestrianGroup extends MovingObject {
 
     public void addPedestrian(Pedestrian pedestrian){
         pedestrians.add(pedestrian);
+    }
+
+    public List<Pedestrian> getPedestrians(){
+        return pedestrians;
     }
 
     @Override

@@ -1,10 +1,13 @@
 package org.example;
 
 import org.example.cells.*;
+import org.example.helpers.Vector2D;
 import org.example.iterable.DrivingPathChances;
 import org.example.iterable.IterablePoint;
 import org.example.iterable.PedestrianExit;
 import org.example.moving.BoardDirection;
+import org.example.moving.Pedestrian;
+import org.example.moving.PedestrianGroup;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -13,10 +16,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.io.Serial;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Stream;
 
 import javax.swing.JComponent;
@@ -62,8 +62,19 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		}
 		MovingObject[][] newMovingObjects = new MovingObject[length][height];
 		for(MovingObject obj : getMovingObjects1d()){
-			obj.move();
-			newMovingObjects[obj.getX()][obj.getY()] = obj;
+			if (obj instanceof PedestrianGroup pedestrianGroup){
+				for (Pedestrian pedestrian: pedestrianGroup.getPedestrians()) {
+					pedestrian.move();
+					if (!(newMovingObjects[pedestrian.getX()][pedestrian.getY()] instanceof PedestrianGroup))
+						newMovingObjects[pedestrian.getX()][pedestrian.getY()] = new PedestrianGroup();
+					PedestrianGroup newPedestrianGroup = (PedestrianGroup)newMovingObjects[pedestrian.getX()][pedestrian.getY()];
+					newPedestrianGroup.addPedestrian(pedestrian);
+				}
+			}
+			else {
+				obj.move();
+				newMovingObjects[obj.getX()][obj.getY()] = obj;
+			}
 		}
 		movingObjects = newMovingObjects;
 
@@ -200,6 +211,7 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		} else if (editType == CellType.PEDESTRIAN) {
 			MovingObject obj = editType.getMovingObject();
 			obj.setPosition(x,y);
+			((Pedestrian)obj).setTargetExit(getRandomPedestrianExit());
 			movingObjects[x][y] = obj;
 		} else {
 			points[x][y] = editType.getObject();
@@ -210,11 +222,16 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 				iterablePoints[x][y] = point;
 			}
 
+			if (points[x][y] instanceof PedestrianExit pedestrianExit){
+				pedestrianExit.setBoard(this);
+			}
+
 			if (points[x][y] instanceof Drivable drivable){
 				drivable.setDrivingPathChances(editChances);
 			}
 
 			if (points[x][y] instanceof WalkablePoint walkable){
+				walkable.setPosition(new Vector2D(x, y));
 				for (int i=-1; i < 2; i++){
 					for (int j=-1; j < 2; j++){
 						int curr_x = x+i;
@@ -334,6 +351,12 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 			}
 			toCheckField.remove(currPoint);
 		}
+	}
+
+	public PedestrianExit getRandomPedestrianExit(){
+		Random rand = new Random();
+		int randomIndex = rand.nextInt(pedestrianExits.size());
+		return pedestrianExits.get(randomIndex);
 	}
 
 // ------------------------------------------------------------------------------

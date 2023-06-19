@@ -1,6 +1,7 @@
 package org.example.cells;
 
 import org.example.Point;
+import org.example.helpers.Vector2D;
 import org.example.iterable.PedestrianExit;
 
 import java.util.*;
@@ -12,6 +13,7 @@ public abstract class WalkablePoint extends Point {
     private static final double STATIC_FIELD_MAX = 100000;
     public int numOfPedestrians = 0;
     int maxNumOfPedestrians = 20;
+    private Vector2D position;
 
     public WalkablePoint(CellType sidewalk) {
         super(sidewalk);
@@ -64,6 +66,14 @@ public abstract class WalkablePoint extends Point {
 
     public boolean isOccupied(){
         return numOfPedestrians >= maxNumOfPedestrians;
+    }
+
+    public void setPosition(Vector2D position){
+        this.position = new Vector2D(position.x(), position.y());
+    }
+
+    public Vector2D getPosition(){
+        return position;
     }
 
     @Override
