@@ -59,25 +59,35 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		for(IterablePoint point : getIterablePoints1d()){
 			point.iterate();
 		}
-
+		// PEDESTRIANS:
 		for(MovingObject obj : getMovingObjects1d()){
-			obj.iterate(points, movingObjects);
+			if (obj instanceof PedestrianGroup)
+				obj.iterate(points, movingObjects);
 		}
 		MovingObject[][] newMovingObjects = new MovingObject[length][height];
-		for(MovingObject obj : getMovingObjects1d()){
-			if (obj instanceof PedestrianGroup pedestrianGroup){
-				for (Pedestrian pedestrian: pedestrianGroup.getPedestrians()) {
+		for(MovingObject obj : getMovingObjects1d()) {
+			if (obj instanceof PedestrianGroup pedestrianGroup) {
+				for (Pedestrian pedestrian : pedestrianGroup.getPedestrians()) {
 					pedestrian.move();
 					if (!(newMovingObjects[pedestrian.getX()][pedestrian.getY()] instanceof PedestrianGroup)) {
 						newMovingObjects[pedestrian.getX()][pedestrian.getY()] = new PedestrianGroup();
 						newMovingObjects[pedestrian.getX()][pedestrian.getY()].setPosition(pedestrian.getX(), pedestrian.getY());
 					}
-					PedestrianGroup newPedestrianGroup = (PedestrianGroup)newMovingObjects[pedestrian.getX()][pedestrian.getY()];
+					PedestrianGroup newPedestrianGroup = (PedestrianGroup) newMovingObjects[pedestrian.getX()][pedestrian.getY()];
 					newPedestrianGroup.addPedestrian(pedestrian);
 				}
 			}
-			else if (obj instanceof Car){
-				obj.move();
+		}
+		// CARS:
+		for(MovingObject obj : getMovingObjects1d()){
+			if (obj instanceof Car)
+				obj.iterate(points, movingObjects);
+		}
+		for(MovingObject obj : getMovingObjects1d()){
+			if (obj instanceof Car){
+				Vector2D carNextPosition = obj.nextPosition;
+				if (newMovingObjects[carNextPosition.x()][carNextPosition.y()] == null)
+					obj.move();
 				newMovingObjects[obj.getX()][obj.getY()] = obj;
 				if (points[obj.getX()][obj.getY()] instanceof WalkablePoint walkablePoint){
 					walkablePoint.resetNumOfPedestrians();

@@ -6,11 +6,14 @@ import org.example.moving.BoardDirection;
 
 import java.util.*;
 
-public class Crossing extends WalkablePoint implements Drivable{
+public class Crossing extends WalkablePoint implements Drivable {
     private DrivingPathChances chances = new DrivingPathChances();
     private Lights lightsController = null;
     private int speedLimit = Config.maxVelocity;
-    public Crossing(){
+    protected int numOfPedestriansOnCrossingMutex = 0;
+
+
+    public Crossing() {
         super(CellType.CROSSING);
     }
 
@@ -31,7 +34,7 @@ public class Crossing extends WalkablePoint implements Drivable{
 
     @Override
     public boolean canDriveThrough() {
-        return true;
+        return numOfPedestriansOnCrossingMutex == 0;
     }
 
     @Override
@@ -40,7 +43,7 @@ public class Crossing extends WalkablePoint implements Drivable{
         Random rand = new Random();
         int percent = rand.nextInt(100);
         int index = 0;
-        for (int chance: directionChances) {
+        for (int chance : directionChances) {
             if (percent < chance) {
                 return BoardDirection.values()[index];
             }
@@ -62,7 +65,27 @@ public class Crossing extends WalkablePoint implements Drivable{
     }
 
     @Override
-    public String getInfo(){
-        return super.getInfo() + ", path chances: "+chances + ", speed limit: " + speedLimit;
+    public String getInfo() {
+        return super.getInfo() + ", path chances: " + chances + ", speed limit: " + speedLimit + ", mutex: " + numOfPedestriansOnCrossingMutex;
+    }
+
+    // -------------------------canDriveThru------------------------------
+
+    public void blockNeighbourCrossing() {
+        ++this.numOfPedestriansOnCrossingMutex;
+        for (WalkablePoint neighbour : walkableNeighbours) {
+            if (neighbour instanceof Crossing crossing && crossing.numOfPedestriansOnCrossingMutex < this.numOfPedestriansOnCrossingMutex) {
+                crossing.blockNeighbourCrossing();
+            }
+        }
+    }
+
+    public void unblockNeighbourCrossing() {
+        --numOfPedestriansOnCrossingMutex;
+        for (WalkablePoint neighbour : walkableNeighbours) {
+            if (neighbour instanceof Crossing crossing && crossing.numOfPedestriansOnCrossingMutex > this.numOfPedestriansOnCrossingMutex) {
+                crossing.unblockNeighbourCrossing();
+            }
+        }
     }
 }

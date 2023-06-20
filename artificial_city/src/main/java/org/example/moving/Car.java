@@ -12,8 +12,6 @@ import org.example.iterable.CarExit;
 
 public class Car extends MovingObject{
     public final static double slowDownChance = 0.2;
-
-    private Vector2D nextPosition;
     private BoardDirection nextDirection;
 
     public Car() {
@@ -29,8 +27,8 @@ public class Car extends MovingObject{
     public void iterate(Point[][] points, MovingObject[][] movingObjects) {
         // Nagel model
         accelerate(points);
-        slowDown(points,movingObjects);
         randomSlowDown();
+        slowDown(points,movingObjects);
     }
 
     public void accelerate(Point[][] points) {
@@ -66,14 +64,11 @@ public class Car extends MovingObject{
             Point point = points[pos.x()][pos.y()];
             maxDistance--;
 
-
-
             if(obj != null || !(point instanceof Drivable d) || !d.canDriveThrough() || maxDistance == 0){
                 if(point instanceof CarExit exit){
                     exit.removeCar(new Vector2D(x,y));
                 }
                 maxVelocity = distanceDriven;
-
                 break;
             }
             int speedLimit = d.getSpeedLimit();
@@ -102,10 +97,8 @@ public class Car extends MovingObject{
         nextDirection = this.direction;
         if(changedDirection){
             velocity = 0;
-//            this.direction = driveDirection;
             nextDirection = driveDirection;
         }
-
     }
 
     public void randomSlowDown() {

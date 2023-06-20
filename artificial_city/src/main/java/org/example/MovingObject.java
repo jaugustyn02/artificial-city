@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.cells.CellType;
+import org.example.helpers.Vector2D;
 import org.example.moving.BoardDirection;
 
 
@@ -9,6 +10,7 @@ public abstract class MovingObject extends Point {
     protected int y;
     protected int velocity = 0;
     protected BoardDirection direction;
+    public Vector2D nextPosition;
 
     public MovingObject(CellType type){
         super(type);

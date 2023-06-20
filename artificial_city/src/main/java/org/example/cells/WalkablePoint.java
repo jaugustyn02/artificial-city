@@ -8,11 +8,11 @@ import org.example.iterable.PedestrianExit;
 import java.util.*;
 
 public abstract class WalkablePoint extends Point {
-    private final List<WalkablePoint> walkableNeighbours = new ArrayList<>();
+    protected final List<WalkablePoint> walkableNeighbours = new ArrayList<>();
     protected final Map<WalkablePoint, Boolean> neighbourIsOnDiagonal = new HashMap<>();
     protected final Map<PedestrianExit, Double> exitStaticFields = new HashMap<>();
     private static final double STATIC_FIELD_MAX = 100000;
-    private int numOfPedestrians = 0;
+    protected int numOfPedestrians = 0;
     private Vector2D position;
 
     public WalkablePoint(CellType type) {
