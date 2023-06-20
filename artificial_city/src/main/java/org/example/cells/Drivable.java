@@ -5,7 +5,6 @@ import org.example.moving.BoardDirection;
 
 
 public interface Drivable {
-//    Lights lightsController = null;
     void setLightsController(Lights l);
 
     boolean canDriveThrough();

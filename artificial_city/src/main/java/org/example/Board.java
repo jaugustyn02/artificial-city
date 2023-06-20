@@ -203,7 +203,12 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		for (x = 0; x < points.length; ++x) {
 			for (y = 0; y < points[x].length; ++y) {
 				Point point = points[x][y];
-				g.setColor(point.type.getColor());
+				if (point == selectedPoint){
+					g.setColor(Color.RED);
+				}
+				else {
+					g.setColor(point.type.getColor());
+				}
 				g.fillRect((x * size) + 1, (y * size) + 1, (size - 1), (size - 1));
 			}
 		}
@@ -225,6 +230,7 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		if (editType == CellType.SELECT){
 			System.out.println("[POINT SELECTED] - {position: ("+x+", "+y+"), "+getCellAt(x, y).getInfo()+"}");
 			selectedPoint = getCellAt(x, y);
+			repaint();
 		}
 		else {
 			setCell(x, y);

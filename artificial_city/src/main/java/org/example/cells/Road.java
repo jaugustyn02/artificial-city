@@ -51,7 +51,6 @@ public class Road extends Point implements Drivable {
             }
             percent -= chance;
         }
-//        return null; // no available direction or error
         return from;
     }
 

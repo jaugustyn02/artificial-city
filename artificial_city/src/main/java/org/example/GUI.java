@@ -26,7 +26,6 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 	private final JFrame frame;
 	private JComboBox<String> filesToLoad;
 	private JPanel editPanel, filePanel;
-//	private int iterNum = 0;
 	private final int maxDelay = 500;
 	int initDelay = 100;
 	private boolean running = false;
@@ -270,8 +269,6 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource().equals(timer)) {
-//			iterNum++;
-//			frame.setTitle("Artificial City simulation (" + iterNum + " iteration)");
 			frame.setTitle(title + " - Time: " + clock.getTime());
 			board.iteration();
 			clock.iterate();
@@ -292,7 +289,6 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 					clear.setEnabled(true);
 					break;
 				case "clear":
-//					iterNum = 0;
 					clock.reset();
 					timer.stop();
 					start.setEnabled(true);
@@ -315,7 +311,6 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 					break;
 				case "load":
 					if (!running) {
-//						iterNum = 0;
 						clock.reset();
 						timer.stop();
 						start.setEnabled(true);

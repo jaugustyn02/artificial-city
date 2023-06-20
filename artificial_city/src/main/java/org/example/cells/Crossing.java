@@ -39,19 +39,6 @@ public class Crossing extends WalkablePoint implements Drivable {
 
     @Override
     public BoardDirection getDriveDirection(BoardDirection from) {
-//        List<Integer> directionChances = chances.getChancesFrom(from).values().stream().toList();
-//        Random rand = new Random();
-//        int percent = rand.nextInt(100);
-//        int index = 0;
-//        for (int chance : directionChances) {
-//            if (percent < chance) {
-//                return BoardDirection.values()[index];
-//            }
-//            percent -= chance;
-//            ++index;
-//        }
-////        return null; // no available direction or error
-//        return from;
         Random rand = new Random();
         int percent = rand.nextInt(100);
         for (BoardDirection to: BoardDirection.values()) {
@@ -61,7 +48,6 @@ public class Crossing extends WalkablePoint implements Drivable {
             }
             percent -= chance;
         }
-//        return null; // no available direction or error
         return from;
     }
 
@@ -80,12 +66,13 @@ public class Crossing extends WalkablePoint implements Drivable {
         return super.getInfo() + ", path chances: " + chances + ", speed limit: " + speedLimit + ", mutex: " + numOfPedestriansOnCrossingMutex;
     }
 
-    // -------------------------canDriveThru------------------------------
+    // -------------------------canDriveThrough------------------------------
 
     public void blockNeighbourCrossing() {
         ++this.numOfPedestriansOnCrossingMutex;
         for (WalkablePoint neighbour : walkableNeighbours) {
-            if (neighbour instanceof Crossing crossing && crossing.numOfPedestriansOnCrossingMutex < this.numOfPedestriansOnCrossingMutex) {
+            if (neighbour instanceof Crossing crossing
+                    && crossing.numOfPedestriansOnCrossingMutex < this.numOfPedestriansOnCrossingMutex) {
                 crossing.blockNeighbourCrossing();
             }
         }
@@ -94,7 +81,8 @@ public class Crossing extends WalkablePoint implements Drivable {
     public void unblockNeighbourCrossing() {
         --numOfPedestriansOnCrossingMutex;
         for (WalkablePoint neighbour : walkableNeighbours) {
-            if (neighbour instanceof Crossing crossing && crossing.numOfPedestriansOnCrossingMutex > this.numOfPedestriansOnCrossingMutex) {
+            if (neighbour instanceof Crossing crossing
+                    && crossing.numOfPedestriansOnCrossingMutex > this.numOfPedestriansOnCrossingMutex) {
                 crossing.unblockNeighbourCrossing();
             }
         }
