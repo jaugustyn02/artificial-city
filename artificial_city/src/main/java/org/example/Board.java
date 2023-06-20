@@ -30,7 +30,7 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	private Point[][] points;
 	private MovingObject[][] movingObjects;
 	private IterablePoint[][] iterablePoints;
-	private final List<PedestrianExit> pedestrianExits = new ArrayList<>();
+	private List<PedestrianExit> pedestrianExits = new ArrayList<>();
 	public List<Lights> lights = new ArrayList<>();
 	public List<LightsCrossingController> lightsCrossingControllers = new ArrayList<>();
 	final public int size = 10;
@@ -113,12 +113,14 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	}
 
 	public void clear() {
-
-
+		pedestrianExits = new ArrayList<>();
+		lights = new ArrayList<>();
+		lightsCrossingControllers = new ArrayList<>();
 
 		for (int x = 0; x < points.length; ++x) {
 			for (int y = 0; y < points[0].length; ++y) {
 				points[x][y] = CellType.NOT_SPECIFIED.getObject();
+				iterablePoints[x][y] = null;
 				removeMovingObjectsAt(x, y);
 			}
 		}

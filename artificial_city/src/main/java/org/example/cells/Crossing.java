@@ -39,16 +39,27 @@ public class Crossing extends WalkablePoint implements Drivable {
 
     @Override
     public BoardDirection getDriveDirection(BoardDirection from) {
-        List<Integer> directionChances = chances.getChancesFrom(from).values().stream().toList();
+//        List<Integer> directionChances = chances.getChancesFrom(from).values().stream().toList();
+//        Random rand = new Random();
+//        int percent = rand.nextInt(100);
+//        int index = 0;
+//        for (int chance : directionChances) {
+//            if (percent < chance) {
+//                return BoardDirection.values()[index];
+//            }
+//            percent -= chance;
+//            ++index;
+//        }
+////        return null; // no available direction or error
+//        return from;
         Random rand = new Random();
         int percent = rand.nextInt(100);
-        int index = 0;
-        for (int chance : directionChances) {
+        for (BoardDirection to: BoardDirection.values()) {
+            int chance = getDrivingPathChances().getChancesFromTo(from, to);
             if (percent < chance) {
-                return BoardDirection.values()[index];
+                return to;
             }
             percent -= chance;
-            ++index;
         }
 //        return null; // no available direction or error
         return from;
