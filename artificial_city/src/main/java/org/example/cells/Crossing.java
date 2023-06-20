@@ -61,7 +61,7 @@ public class Crossing extends WalkablePoint implements Drivable {
 
     @Override
     public void setDrivingPathChances(DrivingPathChances chances) {
-        this.chances = chances;
+        this.chances = new DrivingPathChances(chances);
     }
 
     @Override

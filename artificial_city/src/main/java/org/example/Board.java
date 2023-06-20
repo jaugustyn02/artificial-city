@@ -38,7 +38,7 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	public FileHandler fileHandler = new FileHandler(this);
 	public BoardDirection editDirection = BoardDirection.RIGHT;
 	public DrivingPathChances editChances = new DrivingPathChances();
-	public int editSpeedLimit = 3;
+	public int editSpeedLimit = Config.initialSpeedLimit;
 	public Point selectedPoint = null;
 	private int length;
 	private int height;
@@ -113,6 +113,9 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	}
 
 	public void clear() {
+
+
+
 		for (int x = 0; x < points.length; ++x) {
 			for (int y = 0; y < points[0].length; ++y) {
 				points[x][y] = CellType.NOT_SPECIFIED.getObject();
