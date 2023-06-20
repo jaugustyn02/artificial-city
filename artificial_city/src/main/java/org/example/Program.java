@@ -1,14 +1,15 @@
 package org.example;
 
 import javax.swing.JFrame;
+import java.io.Serial;
 
 public class Program extends JFrame {
-
+	@Serial
 	private static final long serialVersionUID = 1L;
-	private GUI gof;
+	private final GUI gof;
 
 	public Program() {
-		setTitle("Freeway Traffic simulation");
+		setTitle("Artificial City Simulation");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		gof = new GUI(this);

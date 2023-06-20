@@ -67,7 +67,7 @@ public class Road extends Point implements Drivable {
 
     @Override
     public String getInfo(){
-        return "type: "+type+", path chances: "+chances;
+        return super.getInfo() + ", path chances: "+chances + ", Speed limit: " + speedLimit;
     }
 
 }

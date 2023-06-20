@@ -1,5 +1,6 @@
 package org.example.cells;
 
+import org.example.Config;
 import org.example.Point;
 import org.example.helpers.Vector2D;
 import org.example.iterable.PedestrianExit;
@@ -12,11 +13,10 @@ public abstract class WalkablePoint extends Point {
     protected final Map<PedestrianExit, Double> exitStaticFields = new HashMap<>();
     private static final double STATIC_FIELD_MAX = 100000;
     private int numOfPedestrians = 0;
-    int maxNumOfPedestrians = 20;
     private Vector2D position;
 
-    public WalkablePoint(CellType sidewalk) {
-        super(sidewalk);
+    public WalkablePoint(CellType type) {
+        super(type);
     }
 
     public void addWalkableNeighbour(WalkablePoint neighbour) {
@@ -65,7 +65,7 @@ public abstract class WalkablePoint extends Point {
     }
 
     public boolean isOccupied(){
-        return numOfPedestrians >= maxNumOfPedestrians;
+        return numOfPedestrians >= Config.maxPedestriansAtPoint;
     }
 
     public void setPosition(Vector2D position){
@@ -77,11 +77,11 @@ public abstract class WalkablePoint extends Point {
     }
 
     public void incrementNumOfPedestrians(){
-        numOfPedestrians++;
+        ++numOfPedestrians;
     }
 
     public void decrementNumOfPedestrians(){
-        numOfPedestrians--;
+        --numOfPedestrians;
     }
 
     public void resetNumOfPedestrians(){
@@ -90,6 +90,6 @@ public abstract class WalkablePoint extends Point {
 
     @Override
     public String getInfo(){
-        return super.getInfo() + ", StaticFields: " + exitStaticFields.values() + ", NumOfPedestrians: " +numOfPedestrians;
+        return super.getInfo() + ", staticFields: " + exitStaticFields.values() + ", numOfPedestrians: " + numOfPedestrians;
     }
 }

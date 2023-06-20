@@ -14,6 +14,7 @@ import javax.swing.event.ChangeListener;
 
 
 public class GUI extends JPanel implements ActionListener, ChangeListener {
+	private final static String title = "Artificial City Simulation";
 	@Serial private static final long serialVersionUID = 1L;
 	private final Timer timer;
 	private Board board;
@@ -25,14 +26,15 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 	private final JFrame frame;
 	private JComboBox<String> filesToLoad;
 	private JPanel editPanel, filePanel;
-	private int iterNum = 0;
+//	private int iterNum = 0;
 	private final int maxDelay = 500;
+	int initDelay = 100;
 	private boolean running = false;
 	private static final int numOfDirections = BoardDirection.values().length;
 	private JTextField speedLimitTextField;
+	private final Clock clock = new Clock(12, 0, 0);
 	public GUI(JFrame jf) {
 		frame = jf;
-		int initDelay = 100;
 		timer = new Timer(initDelay, this);
 		timer.stop();
 	}
@@ -124,10 +126,13 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 		JLabel speedLimitLabel = new JLabel("Speed limit: ");
 		speedLimitTextField = new JTextField("5");
 		speedLimitTextField.setPreferredSize(new Dimension(40, 20));
-		JButton speedLimitSaveButton = new JButton("S");
+		JButton speedLimitSaveButton = new JButton("Save");
 		speedLimitSaveButton.setActionCommand("save speed limit");
-		speedLimitSaveButton.setPreferredSize(new Dimension(40,20));
+		speedLimitSaveButton.setPreferredSize(new Dimension(55,20));
 		speedLimitSaveButton.addActionListener(this);
+		speedLimitSaveButton.setBorder(BorderFactory.createCompoundBorder(
+				speedLimitSaveButton.getBorder(),
+				BorderFactory.createEmptyBorder(0, -5, 0, -5)));
 
 		editPanel = new JPanel();
 		editPanel.setLayout(layout);
@@ -187,10 +192,10 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 		layout.putConstraint(SpringLayout.WEST, speedLimitLabel, 10, SpringLayout.WEST, editPanel);
 
 		layout.putConstraint(SpringLayout.NORTH, speedLimitTextField, 30, SpringLayout.NORTH, drawType);
-		layout.putConstraint(SpringLayout.WEST, speedLimitTextField, 90, SpringLayout.WEST, speedLimitLabel);
+		layout.putConstraint(SpringLayout.WEST, speedLimitTextField, 71, SpringLayout.WEST, speedLimitLabel);
 
 		layout.putConstraint(SpringLayout.NORTH, speedLimitSaveButton, 30, SpringLayout.NORTH, drawType);
-		layout.putConstraint(SpringLayout.WEST, speedLimitSaveButton, 50, SpringLayout.WEST, speedLimitTextField);
+		layout.putConstraint(SpringLayout.WEST, speedLimitSaveButton, 43, SpringLayout.WEST, speedLimitTextField);
 
 		layout.putConstraint(SpringLayout.NORTH, resetChances, 30, SpringLayout.NORTH, pathChoices[3][3]);
 		layout.putConstraint(SpringLayout.WEST, resetChances, 46, SpringLayout.WEST, editPanel);
@@ -265,9 +270,11 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource().equals(timer)) {
-			iterNum++;
-			frame.setTitle("Artificial City simulation (" + iterNum + " iteration)");
+//			iterNum++;
+//			frame.setTitle("Artificial City simulation (" + iterNum + " iteration)");
+			frame.setTitle(title + " - Time: " + clock.getTime());
 			board.iteration();
+			clock.iterate();
 		} else {
 			String command = e.getActionCommand();
 			switch (command) {
@@ -279,40 +286,44 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 					} else {
 						timer.stop();
 						start.setText("Start");
-						CellType newType = (CellType) drawType.getSelectedItem();
-						board.editType = newType;
+						board.editType = (CellType) drawType.getSelectedItem();
 					}
 					running = !running;
 					clear.setEnabled(true);
 					break;
 				case "clear":
-					iterNum = 0;
+//					iterNum = 0;
+					clock.reset();
 					timer.stop();
 					start.setEnabled(true);
 					board.clear();
-					frame.setTitle("Artificial City simulation");
+					frame.setTitle(title);
 					break;
 				case "drawType":
 					CellType newType = (CellType) drawType.getSelectedItem();
 					System.out.println("Edit type: "+newType);
 					board.editType = newType;
+					if (board.editType != CellType.SELECT){
+						board.selectedPoint = null;
+					}
 					break;
 				case "save":
 					if (!running) {
 						board.save(fileName.getText());
-						frame.setTitle("Artificial City simulation - saved to: " + fileName.getText());
+						frame.setTitle(title + " - saved:" + fileName.getText());
 					}
 					break;
 				case "load":
 					if (!running) {
-						iterNum = 0;
+//						iterNum = 0;
+						clock.reset();
 						timer.stop();
 						start.setEnabled(true);
 						String loadFileName = (String) filesToLoad.getSelectedItem();
 						board.clear();
 						board.load(loadFileName);
 						fileName.setText(loadFileName);
-						frame.setTitle("Artificial City simulation - loaded: " + loadFileName);
+						frame.setTitle(title + " - loaded: " + loadFileName);
 					}
 					break;
 				case "save chances":
@@ -326,6 +337,7 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 							BoardDirection to = BoardDirection.values()[col];
 							board.editChances.setChanceFromTo(from, to, chance);
 						}
+						board.setRoadChances();
 					}
 					break;
 				case "edit":
@@ -350,8 +362,8 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 				case "save speed limit":
 					String limitS = speedLimitTextField.getText();
 					if(isNumeric(limitS)){
-						int limit = Integer.parseInt(limitS);
-						board.setSpeedLimit(limit);
+						board.editSpeedLimit = Integer.parseInt(limitS);
+						board.setSpeedLimit();
 					} else {
 						speedLimitTextField.setText("");
 					}

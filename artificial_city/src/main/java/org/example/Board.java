@@ -4,6 +4,7 @@ import org.example.cells.*;
 import org.example.helpers.Vector2D;
 import org.example.iterable.DrivingPathChances;
 import org.example.iterable.IterablePoint;
+import org.example.iterable.PedestrianEntrance;
 import org.example.iterable.PedestrianExit;
 import org.example.moving.BoardDirection;
 import org.example.moving.Car;
@@ -37,11 +38,11 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	public FileHandler fileHandler = new FileHandler(this);
 	public BoardDirection editDirection = BoardDirection.RIGHT;
 	public DrivingPathChances editChances = new DrivingPathChances();
-	public int editSpeedLimit;
+	public int editSpeedLimit = 3;
+	public Point selectedPoint = null;
 	private int length;
 	private int height;
 	public boolean resizingActive = true;
-	private Point selectedPoint = null;
 
 	public Board(int length, int height) {
 		initialize(length, height);
@@ -78,6 +79,9 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 			else if (obj instanceof Car){
 				obj.move();
 				newMovingObjects[obj.getX()][obj.getY()] = obj;
+				if (points[obj.getX()][obj.getY()] instanceof WalkablePoint walkablePoint){
+					walkablePoint.resetNumOfPedestrians();
+				}
 			}
 		}
 		movingObjects = newMovingObjects;
@@ -237,13 +241,16 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 				iterablePoints[x][y] = point;
 
 				if (point instanceof Entrance entrance){
-					entrance.setSpawnChance(0.1);
+					entrance.setSpawnChance(Config.carSpawnChance);
+					if (entrance instanceof PedestrianEntrance)
+						entrance.setSpawnChance(Config.pedestriansSpawnChance);
 				}
 			}
 
 			if (points[x][y] instanceof Drivable drivable){
 				drivable.setDrivingPathChances(editChances);
 				drivable.setSpeedLimit(editSpeedLimit);
+				System.out.println("Edit: "+editSpeedLimit);
 			}
 
 			if (points[x][y] instanceof WalkablePoint walkable){
@@ -369,6 +376,18 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		return pedestrianExits.get(randomIndex);
 	}
 
+	public void setSpeedLimit() {
+		if (selectedPoint != null && selectedPoint instanceof Drivable d) {
+			d.setSpeedLimit(editSpeedLimit);
+		}
+	}
+
+	public void setRoadChances(){
+		if (selectedPoint != null && selectedPoint instanceof Drivable d){
+			d.setDrivingPathChances(editChances);
+		}
+	}
+
 // ------------------------------------------------------------------------------
 	public void mouseExited(MouseEvent e) {}
 	public void mouseEntered(MouseEvent e) {}
@@ -378,17 +397,4 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	public void mouseMoved(MouseEvent e) {}
 	public void componentHidden(ComponentEvent e) {}
 	public void mousePressed(MouseEvent e) {}
-
-    public void setSpeedLimit(int limit) {
-		if(selectedPoint != null && selectedPoint instanceof Drivable d){
-			System.out.println("SET SPEED");
-			d.setSpeedLimit(limit);
-		}
-    }
-
-	public void editSpeedLimit(int x, int y, int limit) {
-		if(points[x][y] instanceof Drivable d){
-			d.setSpeedLimit(limit);
-		}
-	}
 }

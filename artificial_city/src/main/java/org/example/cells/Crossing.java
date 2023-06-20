@@ -1,7 +1,6 @@
 package org.example.cells;
 
 import org.example.Config;
-import org.example.Point;
 import org.example.iterable.DrivingPathChances;
 import org.example.moving.BoardDirection;
 
@@ -60,5 +59,10 @@ public class Crossing extends WalkablePoint implements Drivable{
     @Override
     public void setDrivingPathChances(DrivingPathChances chances) {
         this.chances = chances;
+    }
+
+    @Override
+    public String getInfo(){
+        return super.getInfo() + ", path chances: "+chances + ", speed limit: " + speedLimit;
     }
 }
